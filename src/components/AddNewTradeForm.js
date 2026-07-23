@@ -68,7 +68,12 @@ const AddNewTradeForm = ({ currentUser, onTradeAdded }) => {
         <h2 className="text-xl font-semibold text-text-primary">Add New Trade</h2>
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <input name="symbol" value={formData.symbol} onChange={handleChange} placeholder="Symbol" className="rounded-lg border border-white/10 bg-primary p-2 text-text-primary outline-none" required />
+        <select name="symbol" value={formData.symbol} onChange={handleChange} className="rounded-lg border border-white/10 bg-primary p-2 text-text-primary outline-none" required>
+          <option value="" disabled>Select symbol</option>
+          <option value="NIFTY">NIFTY</option>
+          <option value="SENSEX">SENSEX</option>
+          <option value="BANKNIFTY">BANKNIFTY</option>
+        </select>
         <input name="date" type="date" value={formData.date} onChange={handleChange} className="rounded-lg border border-white/10 bg-primary p-2 text-text-primary outline-none" required />
         <select name="type" value={formData.type} onChange={handleChange} className="rounded-lg border border-white/10 bg-primary p-2 text-text-primary outline-none">
           <option>Long</option>

@@ -11,6 +11,22 @@ import { ResponsiveLine } from '@nivo/line';
 import { motion } from 'framer-motion';
 import { buildTradePayload } from '../utils/tradeImport';
 
+// --- CSV Export Helper ---
+const exportToCsv = (filename, rows) => {
+    if (!rows || !rows.length) return;
+    const keys = Object.keys(rows[0]);
+    const csv = [keys.join(',')].concat(rows.map(r => keys.map(k => `"${String(r[k] ?? '')}"`).join(','))).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
 const PerformancePage = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [trades, setTrades] = useState([]);
@@ -425,8 +441,9 @@ const PerformancePage = () => {
     const createSampleExcel = () => {
         const sampleData = [
             headers,
-            ["2023-10-26", "AAPL", "Long", 170.50, 168.00, 175.00, "Profit", 4.75],
-            ["2023-10-25", "GOOG", "Short", 138.90, 140.00, 137.00, "Loss", -1.40],
+            ["2023-10-26", "NIFTY", "Long", 19850.50, 19790.00, 19960.00, "Profit", 2750],
+            ["2023-10-25", "SENSEX", "Short", 66250.00, 66380.00, 66000.00, "Loss", -1400],
+            ["2023-10-24", "BANKNIFTY", "Long", 44300.00, 44180.00, 44550.00, "Profit", 3200],
         ];
         const ws = XLSX.utils.aoa_to_sheet(sampleData);
         const wb = XLSX.utils.book_new();
@@ -515,40 +532,70 @@ const PerformancePage = () => {
                 )}
             </div>
 
-            {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-                    <motion.div 
-                        className="bg-surface rounded-xl p-8 w-full max-w-4xl border border-white/10 shadow-lifted"
-                        initial={{ scale: 0.95, y: 20 }}
-                        animate={{ scale: 1, y: 0 }}
-                        exit={{ scale: 0.95, y: 20 }}
-                    >
-                        <ExcelUpload onDataUpload={handleDataUpload} createSampleExcel={createSampleExcel} />
-                        
-                        {uploadProgress && (
-                            <div className="mt-6">
-                                <div className="text-center mb-2 font-semibold text-text-primary">{`Importing... ${uploadProgress.completed} / ${uploadProgress.total} trades completed.`}</div>
-                                <div className="w-full bg-gray-700 rounded-full h-2.5">
-                                    <div className="bg-primary h-2.5 rounded-full transition-all duration-300" style={{ width: `${(uploadProgress.completed / uploadProgress.total) * 100}%` }}></div>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="flex justify-end mt-6">
-                            <button 
-                                onClick={() => {
-                                    setIsModalOpen(false);
-                                    setUploadProgress(null);
-                                }} 
-                                className="bg-surface/80 hover:bg-surface text-text-primary font-bold py-2 px-4 rounded-lg transition"
-                                disabled={uploadProgress && uploadProgress.completed < uploadProgress.total}
+                    {isModalOpen && (
+                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+                            <motion.div 
+                                className="bg-surface rounded-xl p-8 w-full max-w-5xl border border-white/10 shadow-lifted"
+                                initial={{ scale: 0.95, y: 20 }}
+                                animate={{ scale: 1, y: 0 }}
+                                exit={{ scale: 0.95, y: 20 }}
                             >
-                                Close
-                            </button>
+                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div className="flex flex-col gap-4">
+                                        <h3 className="text-xl font-semibold text-text-primary">Bulk Upload Trades</h3>
+                                        <p className="text-sm text-text-secondary">Drag & drop a spreadsheet or choose a file. We validate headers and skip duplicates automatically.</p>
+                                        <ExcelUpload onDataUpload={handleDataUpload} createSampleExcel={createSampleExcel} uploadProgress={uploadProgress} />
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="rounded-xl p-4 bg-surface/60 border border-white/6">
+                                            <h4 className="text-sm font-semibold text-slate-200">Validation & Summary</h4>
+                                            {uploadProgress ? (
+                                                <div className="mt-3">
+                                                    <div className="text-sm text-slate-300">Importing: {uploadProgress.completed} / {uploadProgress.total}</div>
+                                                    <div className="w-full bg-white/10 rounded-full h-3 mt-2">
+                                                        <div className="bg-cyan-400 h-3 rounded-full transition-all" style={{ width: `${(uploadProgress.completed / uploadProgress.total) * 100}%` }} />
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <p className="text-sm text-slate-400 mt-3">No active upload.</p>
+                                            )}
+                                            <div className="mt-4">
+                                                <p className="text-sm text-slate-300">Last action:</p>
+                                                <p className="text-sm font-medium text-slate-100">{uploadProgress ? `Importing ${uploadProgress.completed}/${uploadProgress.total}` : 'Idle'}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="rounded-xl p-4 bg-surface/60 border border-white/6">
+                                            <h4 className="text-sm font-semibold text-slate-200">Validation Rules</h4>
+                                            <ul className="mt-2 text-sm text-slate-300 list-disc list-inside space-y-1">
+                                                <li>Require columns: Date, Symbol, Type, Entry, Stop Loss, Target, Result, Total P&L</li>
+                                                <li>Duplicate rows will be skipped</li>
+                                                <li>Invalid rows are reported in validation summary</li>
+                                            </ul>
+                                        </div>
+
+                                        <div className="rounded-xl p-4 bg-surface/60 border border-white/6">
+                                            <h4 className="text-sm font-semibold text-slate-200">Success</h4>
+                                            <p className="text-sm text-slate-400 mt-2">A subtle success animation appears when imports complete.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end mt-6">
+                                    <button 
+                                        onClick={() => {
+                                            setIsModalOpen(false);
+                                            setUploadProgress(null);
+                                        }} 
+                                        className="bg-surface/80 hover:bg-surface text-text-primary font-bold py-2 px-4 rounded-lg transition"
+                                        disabled={uploadProgress && uploadProgress.completed < uploadProgress.total}
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </motion.div>
                         </div>
-                    </motion.div>
-                </div>
-            )}
+                    )}
 
             {isDeleteModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
@@ -572,7 +619,7 @@ const PerformancePage = () => {
                 <>
                     <div className="mb-6 flex justify-between items-center">
                         <h2 className="text-xl font-semibold text-text-primary">Analytics</h2>
-                        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} className="bg-surface border-white/10 border text-sm rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} className="bg-surface border-white/10 border text-sm rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary text-slate-200">
                             <option value="All">All Months</option>
                             {monthlySummary.map(s => <option key={s.month} value={s.month}>{new Date(s.month).toLocaleString('default', { month: 'short', year: 'numeric' })}</option>)}
                         </select>
@@ -639,7 +686,7 @@ const PerformancePage = () => {
                     >
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-lg font-semibold text-text-primary">Cumulative P&L</h2>
-                            <select value={timeRange} onChange={e => setTimeRange(e.target.value)} className="bg-surface border-white/10 border text-sm rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary">
+                            <select value={timeRange} onChange={e => setTimeRange(e.target.value)} className="bg-surface border-white/10 border text-sm rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary text-slate-200">
                                 <option>Last 7 Days</option>
                                 <option>Last 30 Days</option>
                                 <option>This Month</option>
@@ -684,7 +731,12 @@ const PerformancePage = () => {
                                     }}
                                     colors={['#34D399']}
                                     lineWidth={3}
-                                    enablePoints={false}
+                                    enablePoints={true}
+                                    pointSize={8}
+                                    pointColor="#0f172a"
+                                    pointBorderWidth={2}
+                                    pointBorderColor="#34D399"
+                                    pointLabelYOffset={-12}
                                     useMesh={true}
                                     enableGridX={false}
                                     gridYValues={5}
@@ -694,16 +746,16 @@ const PerformancePage = () => {
                                             legend: { text: { fill: '#A1A1AA', fontSize: 14 } },
                                         },
                                         grid: { line: { stroke: '#52525B', strokeDasharray: '3 3' } },
-                                        tooltip: { container: { background: '#1C1C1C', color: '#E4E4E7', fontSize: '12px', borderRadius: '6px', border: '1px solid #52525B' } },
+                                        tooltip: { container: { background: '#0B1220', color: '#F8FAFC', fontSize: '12px', borderRadius: '8px', border: '1px solid #334155', boxShadow: '0 14px 30px rgba(0, 0, 0, 0.42)', opacity: 1 } },
                                     }}
                                     tooltip={({ point }) => {
                                         const pnl = point.data.dailyPnl;
                                         const pnlColor = pnl >= 0 ? '#34D399' : '#F87171';
                                         return (
-                                            <div className="p-2 rounded-md shadow-lg">
-                                                <strong className="text-text-primary">{point.data.x.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong><br />
-                                                <span style={{ color: pnlColor }}>Daily P&L: ₹{pnl.toLocaleString('en-IN')}</span><br />
-                                                <span className="text-text-secondary">Cumulative: ₹{point.data.y.toLocaleString('en-IN')}</span>
+                                            <div style={{ background: '#0B1220', color: '#F8FAFC', padding: '10px 12px', borderRadius: '8px', minWidth: '180px' }}>
+                                                <strong style={{ color: '#F8FAFC', display: 'block', marginBottom: '6px' }}>{point.data.x.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong>
+                                                <span style={{ color: pnlColor, display: 'block' }}>Daily P&amp;L: ₹{pnl.toLocaleString('en-IN')}</span>
+                                                <span style={{ color: '#CBD5E1', display: 'block', marginTop: '3px' }}>Cumulative: ₹{point.data.y.toLocaleString('en-IN')}</span>
                                             </div>
                                         )
                                     }}
@@ -739,31 +791,36 @@ const PerformancePage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
                     >
-                        <div className="flex justify-between items-center mb-4">
-                            <h2 className="text-xl font-semibold text-text-primary">Trade Log</h2>
-                            {selected.size > 0 && (
-                                <motion.button 
-                                    onClick={handleBulkDelete} 
-                                    className="bg-red-500/80 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg flex items-center"
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                >
-                                    <Trash2 size={16} className="mr-2" />
-                                    Delete Selected ({selected.size})
-                                </motion.button>
-                            )}
-                        </div>
+                        <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
+                                <h2 className="text-xl font-semibold text-text-primary">Trade Log</h2>
+                                <div className="flex items-center gap-2 w-full md:w-auto">
+                                    <input placeholder="Search symbols, remarks..." className="p-2 bg-surface border border-white/10 rounded-md text-sm w-full md:w-64" onChange={(e) => {/* search handled via parent state if needed */}} />
+                                    {selected.size > 0 && (
+                                        <motion.button 
+                                            onClick={handleBulkDelete} 
+                                            className="bg-red-500/80 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg flex items-center"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                        >
+                                            <Trash2 size={16} className="mr-2" />
+                                            Delete Selected ({selected.size})
+                                        </motion.button>
+                                    )}
+                                    <button onClick={() => { exportToCsv('performance_trades.csv', trades.map(t => ({ Date: t.date?.toDate ? t.date.toDate().toISOString() : t.date, Symbol: t.symbol, Type: t.type, Entry: t.entry, StopLoss: t.stopLoss, Target: t.target, Result: t.result, TotalPnl: t.totalPnl }))); }} className="bg-secondary text-white px-3 py-2 rounded-md">Export</button>
+                                </div>
+                            </div>
                         <div className="overflow-x-auto bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft">
-                            <table className="min-w-full text-sm">
-                                <thead className="border-b border-white/10 text-text-secondary">
-                                    <tr>
-                                        <th className="p-3 text-center"><input type="checkbox" onChange={toggleSelectAll} checked={trades.length > 0 && selected.size === trades.length} className="bg-surface border-white/20 rounded"/></th>
+                                <div className="rounded-lg overflow-hidden">
+                                <table className="min-w-full text-sm">
+                                <thead>
+                                    <tr className="bg-primary-light/60">
+                                        <th className="sticky top-0 p-3 text-center bg-primary-light/60"><input type="checkbox" onChange={toggleSelectAll} checked={trades.length > 0 && selected.size === trades.length} className="bg-surface border-white/20 rounded"/></th>
                                         {headers.map(header => {
                                              let key = header.toLowerCase().replace(/\s+/g, '');
                                              if(key === 'totalp&l') key = 'totalPnl';
                                              if(key === 'stoploss') key = 'stopLoss';
                                             return (
-                                                <th key={key} className="p-3 text-center cursor-pointer hover:bg-surface/70 transition-colors" onClick={() => handleSort(key)}>
+                                                <th key={key} className="sticky top-0 p-3 text-center cursor-pointer bg-primary-light/60" onClick={() => handleSort(key)}>
                                                     <div className="flex items-center justify-center">
                                                         {header}
                                                         {renderSortArrow(key)}
@@ -771,12 +828,12 @@ const PerformancePage = () => {
                                                 </th>
                                             )
                                         })}
-                                        <th className="p-3 text-center font-semibold">Actions</th>
+                                        <th className="sticky top-0 p-3 text-center font-semibold bg-primary-light/60">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-text-primary">
                                     {sortedTrades.map(trade => (
-                                        <tr key={trade.id} className={`border-b border-white/5 ${selected.has(trade.id) ? 'bg-primary/20' : 'hover:bg-surface/70'} transition-colors`}>
+                                        <tr key={trade.id} className={`border-b ${selected.has(trade.id) ? 'bg-primary/20' : 'hover:bg-surface/70'} transition-colors rounded-md`}>
                                             <td className="p-3 text-center"><input type="checkbox" checked={selected.has(trade.id)} onChange={() => toggleSelect(trade.id)} className="bg-surface border-white/20 rounded"/></td>
                                             {headers.map(header => renderCell(trade, header))}
                                             <td className="p-3 text-center">
@@ -793,6 +850,7 @@ const PerformancePage = () => {
                                     ))}
                                 </tbody>
                             </table>
+                            </div>
                         </div>
                     </motion.div>
                 </>

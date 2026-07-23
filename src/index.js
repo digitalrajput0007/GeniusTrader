@@ -3,14 +3,16 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { Toaster } from 'react-hot-toast';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <App />
-      <Toaster
+    <ThemeProvider>
+      <AuthProvider>
+        <App />
+        <Toaster
         position="top-center" // <-- THIS IS THE CHANGE
         toastOptions={{
           // Define default options
@@ -36,7 +38,8 @@ root.render(
             },
           }
         }}
-      />
-    </AuthProvider>
+        />
+      </AuthProvider>
+    </ThemeProvider>
   </React.StrictMode>
 );

@@ -97,11 +97,18 @@ const RankingPage = () => {
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredUsers = useMemo(() => {
+        if (!searchQuery) return rankedUsers;
+        const q = searchQuery.toLowerCase();
+        return rankedUsers.filter(u => (`${u.firstName} ${u.lastName}`.toLowerCase().includes(q) || (u.totalPnl || 0).toString().includes(q) || (u.rank || '').toString() === q));
+    }, [rankedUsers, searchQuery]);
 
     const paginatedUsers = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
-        return rankedUsers.slice(startIndex, startIndex + itemsPerPage);
-    }, [rankedUsers, currentPage, itemsPerPage]);
+        return filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredUsers, currentPage, itemsPerPage]);
 
     useEffect(() => {
         const fetchUsersAndStats = async () => {
@@ -163,25 +170,28 @@ const RankingPage = () => {
         <div className="p-4 md:p-6">
             <h1 className="text-3xl font-bold text-text-primary mb-8">User Rankings</h1>
             <div className="bg-primary-light p-6 rounded-lg shadow-lg border border-gray-700">
-                <div className="overflow-x-auto">
+                <div className="flex items-center justify-between mb-4">
+                    <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Search name, rank or P&L..." className="w-full md:w-1/3 p-2 rounded-lg bg-primary border border-white/10 text-white" />
+                </div>
+                <div className="overflow-x-auto rounded-lg">
                     {loading ? (
                         <p className="text-center text-text-secondary">Calculating rankings...</p>
                     ) : (
                         <>
                             <table className="min-w-full text-sm">
-                                <thead className="border-b border-gray-700 text-text-secondary">
-                                    <tr>
-                                        <th className="text-left p-3 font-semibold">Rank</th>
-                                        <th className="text-left p-3 font-semibold">Name</th>
-                                        <th className="text-left p-3 font-semibold">Total P&L</th>
-                                        <th className="text-center p-3 font-semibold">Open Trades</th>
-                                        <th className="text-center p-3 font-semibold">Closed Trades</th>
-                                        <th className="text-center p-3 font-semibold">Avg. Trades/Day</th>
+                                <thead>
+                                    <tr className="bg-primary-light/60">
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Rank</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Name</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Total P&L</th>
+                                        <th className="sticky top-0 text-center p-3 font-semibold bg-primary-light/60">Open Trades</th>
+                                        <th className="sticky top-0 text-center p-3 font-semibold bg-primary-light/60">Closed Trades</th>
+                                        <th className="sticky top-0 text-center p-3 font-semibold bg-primary-light/60">Avg. Trades/Day</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-text-primary">
                                     {paginatedUsers.map(user => (
-                                        <tr key={user.id} className="border-b border-gray-700 hover:bg-primary transition">
+                                        <tr key={user.id} className="border-b last:rounded-b-lg hover:bg-surface/60 transition-colors">
                                             <td className="p-3 font-bold text-secondary">{user.rank}</td>
                                             <td className="p-3">{user.firstName} {user.lastName}</td>
                                             <td className={`p-3 font-bold ${user.totalPnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -195,7 +205,7 @@ const RankingPage = () => {
                                 </tbody>
                             </table>
                             <TableControls 
-                                totalItems={rankedUsers.length} 
+                                totalItems={filteredUsers.length} 
                                 itemsPerPage={itemsPerPage} 
                                 setItemsPerPage={setItemsPerPage} 
                                 currentPage={currentPage} 

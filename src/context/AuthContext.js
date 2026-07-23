@@ -126,6 +126,7 @@ export function AuthProvider({ children }) {
     const value = {
         currentUser,
         userData,
+        loading,
         isSigningUp, // <-- Export the new state
         signup,
         login,

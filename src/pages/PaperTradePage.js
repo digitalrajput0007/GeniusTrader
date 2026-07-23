@@ -110,6 +110,22 @@ const TableControls = ({ totalItems, itemsPerPage, setItemsPerPage, currentPage,
     );
 };
 
+// --- CSV Export Helper ---
+const exportToCsv = (filename, rows) => {
+    if (!rows || !rows.length) return;
+    const keys = Object.keys(rows[0]);
+    const csv = [keys.join(',')].concat(rows.map(r => keys.map(k => `"${String(r[k] ?? '')}"`).join(','))).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
 // --- Segmented Speedometer Gauge Component ---
 const WinRateGauge = ({ winPercentage = 0 }) => {
     const percentage = Math.min(100, Math.max(0, winPercentage));
@@ -518,25 +534,25 @@ const PaperTradePage = () => {
             <div className="bg-primary-light p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
                 <h2 className="text-xl font-semibold text-text-primary mb-4">Open Positions</h2>
                 <div className="overflow-x-auto">
-                    {loading ? <p className="text-text-secondary">Loading...</p> : openPositions.length > 0 ? (
-                        <>
-                            <table className="min-w-full text-sm hidden md:table">
-                                <thead className="border-b border-gray-700 text-text-secondary">
-                                    <tr>
-                                        <th className="text-left p-3 font-semibold">Symbol</th>
-                                        <th className="text-left p-3 font-semibold">Type</th>
-                                        <th className="text-left p-3 font-semibold">Quantity</th>
-                                        <th className="text-left p-3 font-semibold">Entry Price</th>
-                                        <th className="text-left p-3 font-semibold">Brokerage</th>
-                                        <th className="text-left p-3 font-semibold">Entry Date & Time</th>
-                                        <th className="text-left p-3 font-semibold">Remarks</th>
-                                        <th className="text-left p-3 font-semibold">Exit Price</th>
-                                        <th className="text-left p-3 font-semibold">Actions</th>
+                            {loading ? <p className="text-text-secondary">Loading...</p> : openPositions.length > 0 ? (<>
+                            <div className="rounded-lg overflow-hidden">
+                              <table className="min-w-full text-sm hidden md:table">
+                                <thead>
+                                    <tr className="bg-primary-light/60">
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Symbol</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Type</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Quantity</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Entry Price</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Brokerage</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Entry Date & Time</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Remarks</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Exit Price</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-text-primary">
                                     {paginatedOpenPositions.map(pos => (
-                                        <tr key={pos.id} className="border-b border-gray-700 hover:bg-primary transition">
+                                        <tr key={pos.id} className="border-b last:rounded-b-lg hover:bg-surface/60 transition-colors">
                                             <td className="p-3 font-bold">{pos.symbol}</td>
                                             <td className={`p-3 font-bold ${pos.type === 'BUY' ? 'text-green-400' : 'text-red-400'}`}>{pos.type}</td>
                                             <td className="p-3">{pos.quantity}</td>
@@ -557,7 +573,7 @@ const PaperTradePage = () => {
                                         </tr>
                                     ))}
                                 </tbody>
-                            </table>
+                              </table>
                             <div className="md:hidden space-y-4">
                                 {paginatedOpenPositions.map(pos => (
                                     <div key={pos.id} className="bg-primary p-4 rounded-lg border border-gray-700">
@@ -581,6 +597,7 @@ const PaperTradePage = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
                             </div>
                             <TableControls totalItems={openPositions.length} itemsPerPage={openItemsPerPage} setItemsPerPage={setOpenItemsPerPage} currentPage={openCurrentPage} setCurrentPage={setOpenCurrentPage} />
                         </>
@@ -615,28 +632,30 @@ const PaperTradePage = () => {
                             <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="bg-transparent focus:outline-none text-sm" />
                         </div>
                         <button onClick={clearFilters} className="p-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition text-sm">Clear</button>
+                        <button onClick={() => exportToCsv('trades_export.csv', processedClosedTrades.map(t => ({ Symbol: t.symbol, Type: t.type, PnL: t.pnl, Entry: t.entryPrice, Exit: t.exitPrice, Brokerage: t.brokerage, ExitDate: t.exitDate ? t.exitDate.toDate ? t.exitDate.toDate().toISOString() : t.exitDate : '' , Remarks: t.remarks })))} className="p-2 bg-secondary hover:bg-secondary-dark text-white rounded-lg transition text-sm">Export</button>
                     </div>
                 </div>
                 <div className="overflow-x-auto">
                     {loading ? <p className="text-text-secondary">Loading...</p> : processedClosedTrades.length > 0 ? (
                         <>
-                            <table className="min-w-full text-sm hidden md:table">
-                                <thead className="border-b border-gray-700 text-text-secondary">
-                                    <tr>
-                                        <SortableHeader sortKey="symbol">Symbol</SortableHeader>
-                                        <SortableHeader sortKey="type">Type</SortableHeader>
-                                        <SortableHeader sortKey="pnl">Net P/L</SortableHeader>
-                                        <SortableHeader sortKey="entryPrice">Entry Price</SortableHeader>
-                                        <SortableHeader sortKey="exitPrice">Exit Price</SortableHeader>
-                                        <SortableHeader sortKey="brokerage">Brokerage</SortableHeader>
-                                        <SortableHeader sortKey="exitDate">Exit Date & Time</SortableHeader>
-                                        <th className="text-left p-3 font-semibold">Remarks</th>
-                                        <th className="text-left p-3 font-semibold">Action</th>
+                            <div className="rounded-lg overflow-hidden">
+                              <table className="min-w-full text-sm hidden md:table">
+                                <thead>
+                                    <tr className="bg-primary-light/60">
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Symbol</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Type</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Net P/L</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Entry Price</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Exit Price</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Brokerage</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Exit Date & Time</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Remarks</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-text-primary">
                                     {paginatedClosedTrades.map(trade => (
-                                        <tr key={trade.id} className="border-b border-gray-700 hover:bg-primary transition">
+                                        <tr key={trade.id} className="border-b last:rounded-b-lg hover:bg-surface/60 transition-colors">
                                             <td className="p-3 font-bold">{trade.symbol}</td>
                                             <td className={`p-3 font-bold ${trade.type === 'BUY' ? 'text-green-400' : 'text-red-400'}`}>{trade.type}</td>
                                             <td className={`p-3 font-bold ${trade.pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>{trade.pnl >= 0 ? '+' : ''}{formatCurrency(trade.pnl)}</td>
@@ -651,7 +670,7 @@ const PaperTradePage = () => {
                                         </tr>
                                     ))}
                                 </tbody>
-                            </table>
+                              </table>
                             <div className="md:hidden space-y-4">
                                 {paginatedClosedTrades.map(trade => (
                                     <div key={trade.id} className="bg-primary p-4 rounded-lg border border-gray-700">
@@ -671,6 +690,7 @@ const PaperTradePage = () => {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
                             </div>
                             <TableControls totalItems={processedClosedTrades.length} itemsPerPage={closedItemsPerPage} setItemsPerPage={setClosedItemsPerPage} currentPage={closedCurrentPage} setCurrentPage={setClosedCurrentPage} />
                         </>

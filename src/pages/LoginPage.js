@@ -2,105 +2,166 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth } from '../firebase';
-
-// --- Helper Components & Icons ---
-const EyeIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>);
-const EyeSlashIcon = ({ className }) => (<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}><path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.243 4.243L6.228 6.228" /></svg>);
+import { Activity, ArrowRight, BarChart3, BrainCircuit, CheckCircle2, Cloud, Eye, EyeOff, Lock, Mail, NotebookPen, ShieldAlert, Sparkles } from 'lucide-react';
 
 const LoginPage = () => {
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams(); // Hook to read URL parameters
-    
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
-    const [verificationMessage, setVerificationMessage] = useState('');
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-    // --- THIS IS THE NEW PART ---
-    // When the page loads, check for the 'verified' parameter in the URL
-    useEffect(() => {
-        if (searchParams.get('verified') === 'true') {
-            setVerificationMessage('Email verified successfully! You can now log in.');
-        }
-    }, [searchParams]);
-    // ----------------------------
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [verificationMessage, setVerificationMessage] = useState('');
 
-    const handleResendVerification = async () => {
-        if (!auth.currentUser) {
-            setError("You must be logged in to resend a verification email.");
-            return;
-        }
-        try {
-            await sendEmailVerification(auth.currentUser);
-            setError("A new verification email has been sent.");
-        } catch (err) {
-            setError("Failed to send verification email.");
-        }
-    };
+  useEffect(() => {
+    if (searchParams.get('verified') === 'true') {
+      setVerificationMessage('Email verified successfully! You can now log in.');
+    }
+  }, [searchParams]);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
-        setLoading(true);
+  const handleResendVerification = async () => {
+    if (!auth.currentUser) {
+      setError('You must be logged in to resend a verification email.');
+      return;
+    }
+    try {
+      await sendEmailVerification(auth.currentUser);
+      setError('A new verification email has been sent.');
+    } catch (err) {
+      setError('Failed to send verification email.');
+    }
+  };
 
-        try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
 
-            if (!user.emailVerified) {
-                setError('Please verify your email address before logging in.');
-                // Optionally, give them a way to resend the email
-                // For simplicity, we can just show the error.
-                // You could add a button that calls handleResendVerification.
-                setLoading(false);
-                return;
-            }
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-            navigate('/');
-        } catch (err) {
-            setError('Failed to log in. Please check your email and password.');
-        } finally {
-            setLoading(false);
-        }
-    };
+      if (!user.emailVerified) {
+        setError('Please verify your email address before logging in.');
+        setLoading(false);
+        return;
+      }
 
-    return (
-        <div className="min-h-screen bg-primary flex items-center justify-center p-4">
-            <div className="bg-primary-light p-8 rounded-lg shadow-lg w-full max-w-md border border-gray-700">
-                <h2 className="text-3xl font-bold mb-6 text-center text-text-primary">Welcome Back</h2>
-                
-                {/* --- Display the success message here --- */}
-                {verificationMessage && <p className="bg-green-900 border border-green-700 text-green-300 p-3 rounded-lg mb-4 text-center">{verificationMessage}</p>}
-                {error && <p className="bg-red-900 border border-red-700 text-red-300 p-3 rounded-lg mb-4 text-center">{error}</p>}
-                
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-text-secondary mb-2">Email Address</label>
-                        <input type="email" name="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-3 bg-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary" required />
-                    </div>
-                    <div className="relative">
-                        <label htmlFor="password"className="block text-sm font-medium text-text-secondary mb-2">Password</label>
-                        <input type={showPassword ? "text" : "password"} name="password" id="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-3 bg-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary" required />
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 top-7 px-3 flex items-center text-gray-400 hover:text-secondary">
-                            {showPassword ? <EyeSlashIcon className="h-5 w-5"/> : <EyeIcon className="h-5 w-5"/>}
-                        </button>
-                    </div>
-                    <div className="text-right">
-                        <Link to="/forgot-password" className="text-sm text-secondary hover:underline">Forgot Password?</Link>
-                    </div>
-                    <button type="submit" disabled={loading} className="w-full bg-secondary hover:bg-secondary-dark text-white font-bold py-3 rounded-lg transition duration-300 disabled:bg-gray-500">
-                        {loading ? 'Logging In...' : 'Log In'}
-                    </button>
-                </form>
-                <p className="mt-6 text-center text-sm text-text-secondary">
-                    Don't have an account?{' '}
-                    <Link to="/signup" className="font-medium text-secondary hover:underline">Sign Up</Link>
-                </p>
+      navigate('/dashboard');
+    } catch (err) {
+      setError('Failed to log in. Please check your email and password.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const featureItems = [
+    { icon: BrainCircuit, label: 'AI Trading Analytics' },
+    { icon: BarChart3, label: 'Performance Dashboard' },
+    { icon: NotebookPen, label: 'Trading Journal' },
+    { icon: ShieldAlert, label: 'Risk Analysis' },
+    { icon: Cloud, label: 'Cloud Sync' },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.14),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.15),_transparent_28%),#020617] px-3 py-4 text-slate-100 sm:px-5 lg:px-6">
+      <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-7xl overflow-hidden rounded-[24px] border border-white/10 bg-slate-900/60 shadow-[0_35px_120px_rgba(2,6,23,0.55)] backdrop-blur-2xl lg:rounded-[28px]">
+        <div className="relative hidden w-[48%] flex-col justify-between overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8 lg:flex">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_rgba(34,211,238,0.2),_transparent_25%),radial-gradient(circle_at_80%_70%,_rgba(34,197,94,0.18),_transparent_30%)]" />
+          <div className="absolute right-8 top-8 h-36 w-36 rounded-full border border-cyan-400/20 bg-cyan-400/10 blur-3xl" />
+          <div className="absolute bottom-8 left-10 h-32 w-32 rounded-full border border-emerald-400/20 bg-emerald-400/10 blur-3xl" />
+          <div className="relative z-10">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-sm text-cyan-200">
+              <Sparkles size={16} />
+              Built for modern traders
             </div>
+            <h1 className="max-w-lg text-4xl font-semibold tracking-tight text-white sm:text-[2.6rem] leading-tight">
+              Master Your Trading Performance
+            </h1>
+            <p className="mt-4 max-w-lg text-base leading-7 text-slate-400">
+              Turn every trade into a sharper insight with real-time analytics, journal clarity, and risk intelligence in one premium workspace.
+            </p>
+          </div>
+
+          <div className="relative z-10 rounded-[24px] border border-white/10 bg-white/5 p-5 shadow-[0_18px_50px_rgba(2,6,23,0.2)] backdrop-blur-xl">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-emerald-400 text-slate-950">
+                <Activity size={20} />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-white">Performance overview</p>
+                <p className="text-sm text-slate-400">Live edge indicators and review trends</p>
+              </div>
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {featureItems.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/40 px-3 py-2 text-sm text-slate-300">
+                  <Icon size={15} className="text-cyan-300" />
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-    );
+
+        <div className="flex flex-1 items-center justify-center p-4 sm:p-6 lg:p-8">
+          <div className="w-full max-w-md rounded-[20px] border border-white/10 bg-slate-950/70 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)] sm:p-8">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-emerald-400 text-slate-950">
+                <Sparkles size={20} />
+              </div>
+              <div>
+                <p className="text-lg font-semibold text-white">TradePilot</p>
+                <p className="text-sm text-slate-400">Performance OS</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <p className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-300">Welcome Back</p>
+              <h2 className="mt-2 text-3xl font-semibold text-white">Sign in to your desk</h2>
+              <p className="mt-2 text-sm text-slate-400">Continue your review ritual with a brighter, faster workspace.</p>
+            </div>
+
+            {verificationMessage && <div className="mb-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">{verificationMessage}</div>}
+            {error && <div className="mb-4 rounded-2xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">{error}</div>}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="relative">
+                <Mail size={16} className="pointer-events-none absolute left-3 top-[14px] text-slate-500" />
+                <input type="email" id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-[16px] border border-white/10 bg-slate-900/80 py-3 pl-10 pr-4 text-sm text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" placeholder="Email address" required />
+              </div>
+              <div className="relative">
+                <Lock size={16} className="pointer-events-none absolute left-3 top-[14px] text-slate-500" />
+                <input type={showPassword ? 'text' : 'password'} id="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-[16px] border border-white/10 bg-slate-900/80 py-3 pl-10 pr-12 text-sm text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" placeholder="Password" required />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-[13px] text-slate-400 transition hover:text-cyan-300">
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                </button>
+              </div>
+              <div className="flex items-center justify-between text-sm">
+                <label className="flex items-center gap-2 text-slate-400">
+                  <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="h-4 w-4 rounded border-white/10 bg-slate-900 text-cyan-400" />
+                  Remember me
+                </label>
+                <Link to="/forgot-password" className="font-medium text-cyan-300 transition hover:text-cyan-200">Forgot password?</Link>
+              </div>
+              <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-gradient-to-r from-cyan-400 to-emerald-400 px-4 py-3.5 font-semibold text-slate-950 transition duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70">
+                {loading ? 'Signing in...' : 'Sign in'}
+                <ArrowRight size={18} />
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-slate-400">
+              Don&apos;t have an account?{' '}
+              <Link to="/signup" className="font-semibold text-cyan-300 transition hover:text-cyan-200">Create account</Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default LoginPage;

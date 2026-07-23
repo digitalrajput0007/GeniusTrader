@@ -91,11 +91,18 @@ const AdminPage = () => {
     
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredUsers = useMemo(() => {
+        if (!searchQuery) return users;
+        const q = searchQuery.toLowerCase();
+        return users.filter(u => `${u.firstName} ${u.lastName}`.toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q) || (u.role || '').toLowerCase().includes(q));
+    }, [users, searchQuery]);
 
     const paginatedUsers = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
-        return users.slice(startIndex, startIndex + itemsPerPage);
-    }, [users, currentPage, itemsPerPage]);
+        return filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+    }, [filteredUsers, currentPage, itemsPerPage]);
 
     useEffect(() => {
         const fetchUsers = async () => {
@@ -155,39 +162,44 @@ const AdminPage = () => {
 
     return (
         <div className="p-4 md:p-6">
-            <div className="flex justify-end items-center mb-8">
-                <button 
-                    onClick={handleExport} 
-                    className="flex items-center bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition"
-                    disabled={loading || users.length === 0}
-                >
-                    <ExportIcon />
-                    Export to Excel
-                </button>
+            <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
+                <div className="flex items-center w-full md:w-1/2">
+                    <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Search users, email or role..." className="w-full p-2 rounded-lg bg-primary border border-white/10 text-white" />
+                </div>
+                <div className="flex items-center">
+                    <button 
+                        onClick={handleExport} 
+                        className="flex items-center bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition"
+                        disabled={loading || users.length === 0}
+                    >
+                        <ExportIcon />
+                        Export to Excel
+                    </button>
+                </div>
             </div>
 
             <div className="bg-primary-light p-6 rounded-lg shadow-lg border border-gray-700">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto rounded-lg">
                     {loading ? (
                         <p className="text-center text-text-secondary">Loading users...</p>
                     ) : (
                         <>
                             <table className="min-w-full text-sm">
-                                <thead className="border-b border-gray-700 text-text-secondary">
-                                    <tr>
-                                        <th className="text-left p-3 font-semibold">Name</th>
-                                        <th className="text-left p-3 font-semibold">Email</th>
-                                        <th className="text-left p-3 font-semibold">Mobile</th>
-                                        <th className="text-left p-3 font-semibold">Gender</th>
-                                        <th className="text-left p-3 font-semibold">Role</th>
-                                        <th className="text-left p-3 font-semibold">Created At</th>
+                                <thead>
+                                    <tr className="bg-primary-light/60">
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Name</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Email</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Mobile</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Gender</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Role</th>
+                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Created At</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-text-primary">
                                     {paginatedUsers.map(user => (
                                         <tr 
                                             key={user.id} 
-                                            className="border-b border-gray-700 hover:bg-primary transition"
+                                            className="border-b last:rounded-b-lg hover:bg-surface/60 transition-colors rounded-md"
                                         >
                                             <td className="p-3">{user.firstName} {user.lastName}</td>
                                             <td className="p-3">{user.email}</td>
@@ -204,7 +216,7 @@ const AdminPage = () => {
                                 </tbody>
                             </table>
                              <TableControls 
-                                totalItems={users.length} 
+                                totalItems={filteredUsers.length} 
                                 itemsPerPage={itemsPerPage} 
                                 setItemsPerPage={setItemsPerPage} 
                                 currentPage={currentPage} 

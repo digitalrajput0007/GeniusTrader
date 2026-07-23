@@ -17,7 +17,8 @@ import AdminPage from './pages/AdminPage';
 import ActionHandlerPage from './pages/ActionHandlerPage';
 import ProfilePage from './pages/ProfilePage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
-import RankingPage from './pages/RankingPage'; // <-- Import the new RankingPage
+import RankingPage from './pages/RankingPage';
+import PerformancePage from './pages/PerformancePage';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="/change-password" element={<ProtectedRoute><ChangePasswordPage /></ProtectedRoute>} />
           <Route path="/currency-converter" element={<ProtectedRoute><CurrencyConverterPage /></ProtectedRoute>} />
           <Route path="/risk-management" element={<ProtectedRoute><RiskManagementPage /></ProtectedRoute>} />
+          <Route path="/performance" element={<ProtectedRoute><PerformancePage /></ProtectedRoute>} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />

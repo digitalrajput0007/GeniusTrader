@@ -66,10 +66,6 @@ const AppShell = ({ children }) => {
       </nav>
       <div className="gt-sidebar__bottom">
         <Link to="/change-password" className="gt-nav-link" title={collapsed ? 'Settings' : undefined}><Settings size={19} />{!collapsed && <span>Settings</span>}</Link>
-        <div className="gt-upgrade-card">
-          {!collapsed && <><span className="gt-upgrade-card__eyebrow">GENIUS PRO</span><strong>Trade with more clarity.</strong><p>Build a repeatable edge with your data.</p></>}
-          {!collapsed && <Link to="/pricing">Explore plans</Link>}
-        </div>
       </div>
     </aside>
   );

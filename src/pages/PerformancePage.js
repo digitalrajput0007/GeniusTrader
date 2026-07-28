@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { db, auth } from '../firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc, Timestamp, addDoc } from 'firebase/firestore';
 import ExcelUpload from '../components/ExcelUpload';
@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 import AddNewTradeForm from '../components/AddNewTradeForm';
 import FourMonthCalendar from '../components/MonthlyCalendar';
 import { ResponsiveLine } from '@nivo/line';
-import { motion } from 'framer-motion';
+import { motion, animate } from 'framer-motion';
 import { buildTradePayload } from '../utils/tradeImport';
 
 // --- CSV Export Helper ---
@@ -489,6 +489,22 @@ const PerformancePage = () => {
 
     const StatCard = ({ title, value, icon, isLoading }) => {
         const Icon = icon;
+        const valueRef = useRef(null);
+        const isNumeric = typeof value === 'number';
+    
+        useEffect(() => {
+            if (isLoading || !isNumeric || !valueRef.current) return;
+    
+            const node = valueRef.current;
+            const controls = animate(0, value, {
+                duration: 0.5,
+                onUpdate(latest) {
+                    node.textContent = Math.round(latest);
+                }
+            });
+            return () => controls.stop();
+        }, [value, isLoading, isNumeric]);
+    
         if (isLoading) {
             return (
                 <div className="bg-surface/50 backdrop-blur-sm p-5 rounded-xl border border-white/10 shadow-soft h-full">
@@ -499,6 +515,7 @@ const PerformancePage = () => {
                 </div>
             )
         }
+    
         return (
             <motion.div 
                 className="bg-surface/50 backdrop-blur-sm p-5 rounded-xl border border-white/10 shadow-soft flex flex-col justify-between h-full"
@@ -509,7 +526,9 @@ const PerformancePage = () => {
                     <Icon className="text-text-tertiary" size={20} />
                 </div>
                 <div>
-                    <h3 className="text-2xl font-bold text-text-primary mt-2">{value}</h3>
+                    <h3 className="text-2xl font-bold text-text-primary mt-2">
+                        {isNumeric ? <span ref={valueRef}>0</span> : value}
+                    </h3>
                 </div>
             </motion.div>
         );
@@ -517,85 +536,48 @@ const PerformancePage = () => {
 
     return (
         <div className="space-y-8">
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold text-text-primary">Performance</h1>
-                {currentUser && (
-                    <motion.button 
-                        onClick={() => setIsModalOpen(true)} 
-                        className="p-2 rounded-full bg-primary text-white hover:bg-primary-dark transition-colors"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        title="Upload Trades"
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <motion.div 
+                        className="bg-gray-800 rounded-xl p-8 w-full max-w-2xl border border-gray-700 shadow-lg"
+                        initial={{ scale: 0.95, y: -20, opacity: 0 }}
+                        animate={{ scale: 1, y: 0, opacity: 1 }}
+                        exit={{ scale: 0.95, y: -20, opacity: 0 }}
                     >
-                        <Upload size={20} />
-                    </motion.button>
-                )}
-            </div>
-
-                    {isModalOpen && (
-                        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
-                            <motion.div 
-                                className="bg-surface rounded-xl p-8 w-full max-w-5xl border border-white/10 shadow-lifted"
-                                initial={{ scale: 0.95, y: 20 }}
-                                animate={{ scale: 1, y: 0 }}
-                                exit={{ scale: 0.95, y: 20 }}
+                        <h3 className="text-xl font-semibold text-white mb-2">Bulk Upload Trades</h3>
+                        <p className="text-sm text-gray-400 mb-6">Drag & drop a spreadsheet or choose a file. We validate headers and skip duplicates automatically.</p>
+                        <ExcelUpload onDataUpload={handleDataUpload} createSampleExcel={createSampleExcel} uploadProgress={uploadProgress} />
+                        {uploadProgress && (
+                            <div className="mt-6 w-full">
+                                <div className="flex justify-between text-sm text-gray-400 mb-1">
+                                    <span>Importing Trades...</span>
+                                    <span>{uploadProgress.completed} / {uploadProgress.total}</span>
+                                </div>
+                                <div className="w-full bg-gray-700 rounded-full h-2.5">
+                                    <motion.div 
+                                        className="bg-green-500 h-2.5 rounded-full"
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${(uploadProgress.completed / uploadProgress.total) * 100}%` }}
+                                        transition={{ duration: 0.5 }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                         <div className="flex justify-end mt-6">
+                            <button 
+                                onClick={() => {
+                                    setIsModalOpen(false);
+                                    setUploadProgress(null);
+                                }} 
+                                className="bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-lg transition"
+                                disabled={uploadProgress && uploadProgress.completed < uploadProgress.total}
                             >
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                    <div className="flex flex-col gap-4">
-                                        <h3 className="text-xl font-semibold text-text-primary">Bulk Upload Trades</h3>
-                                        <p className="text-sm text-text-secondary">Drag & drop a spreadsheet or choose a file. We validate headers and skip duplicates automatically.</p>
-                                        <ExcelUpload onDataUpload={handleDataUpload} createSampleExcel={createSampleExcel} uploadProgress={uploadProgress} />
-                                    </div>
-                                    <div className="space-y-4">
-                                        <div className="rounded-xl p-4 bg-surface/60 border border-white/6">
-                                            <h4 className="text-sm font-semibold text-slate-200">Validation & Summary</h4>
-                                            {uploadProgress ? (
-                                                <div className="mt-3">
-                                                    <div className="text-sm text-slate-300">Importing: {uploadProgress.completed} / {uploadProgress.total}</div>
-                                                    <div className="w-full bg-white/10 rounded-full h-3 mt-2">
-                                                        <div className="bg-cyan-400 h-3 rounded-full transition-all" style={{ width: `${(uploadProgress.completed / uploadProgress.total) * 100}%` }} />
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <p className="text-sm text-slate-400 mt-3">No active upload.</p>
-                                            )}
-                                            <div className="mt-4">
-                                                <p className="text-sm text-slate-300">Last action:</p>
-                                                <p className="text-sm font-medium text-slate-100">{uploadProgress ? `Importing ${uploadProgress.completed}/${uploadProgress.total}` : 'Idle'}</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="rounded-xl p-4 bg-surface/60 border border-white/6">
-                                            <h4 className="text-sm font-semibold text-slate-200">Validation Rules</h4>
-                                            <ul className="mt-2 text-sm text-slate-300 list-disc list-inside space-y-1">
-                                                <li>Require columns: Date, Symbol, Type, Entry, Stop Loss, Target, Result, Total P&L</li>
-                                                <li>Duplicate rows will be skipped</li>
-                                                <li>Invalid rows are reported in validation summary</li>
-                                            </ul>
-                                        </div>
-
-                                        <div className="rounded-xl p-4 bg-surface/60 border border-white/6">
-                                            <h4 className="text-sm font-semibold text-slate-200">Success</h4>
-                                            <p className="text-sm text-slate-400 mt-2">A subtle success animation appears when imports complete.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-end mt-6">
-                                    <button 
-                                        onClick={() => {
-                                            setIsModalOpen(false);
-                                            setUploadProgress(null);
-                                        }} 
-                                        className="bg-surface/80 hover:bg-surface text-text-primary font-bold py-2 px-4 rounded-lg transition"
-                                        disabled={uploadProgress && uploadProgress.completed < uploadProgress.total}
-                                    >
-                                        Close
-                                    </button>
-                                </div>
-                            </motion.div>
+                                Close
+                            </button>
                         </div>
-                    )}
+                    </motion.div>
+                </div>
+            )}
 
             {isDeleteModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
@@ -619,10 +601,15 @@ const PerformancePage = () => {
                 <>
                     <div className="mb-6 flex justify-between items-center">
                         <h2 className="text-xl font-semibold text-text-primary">Analytics</h2>
-                        <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} className="bg-surface border-white/10 border text-sm rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary text-slate-200">
-                            <option value="All">All Months</option>
-                            {monthlySummary.map(s => <option key={s.month} value={s.month}>{new Date(s.month).toLocaleString('default', { month: 'short', year: 'numeric' })}</option>)}
-                        </select>
+                        <div className="flex items-center gap-4">
+                            <select value={selectedMonth} onChange={e => setSelectedMonth(e.target.value)} className="bg-surface border-white/10 border text-sm rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary text-slate-200">
+                                <option value="All">All Months</option>
+                                {monthlySummary.map(s => <option key={s.month} value={s.month}>{new Date(s.month).toLocaleString('default', { month: 'short', year: 'numeric' })}</option>)}
+                            </select>
+                            <button onClick={() => setIsModalOpen(true)} className="bg-primary text-white px-3 py-2 rounded-md flex items-center gap-2">
+                                <Upload size={16} /> Import from Excel
+                            </button>
+                        </div>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-6">
                         <StatCard title="Total Trades" value={stats.totalTrades} icon={BarChart2} isLoading={!trades.length} />
@@ -633,7 +620,7 @@ const PerformancePage = () => {
                              <p className="text-sm font-medium text-text-secondary mb-2">Win Rate</p>
                              <div className="w-full bg-surface rounded-full h-4">
                                 <motion.div 
-                                    className="bg-primary h-4 rounded-full"
+                                    className="bg-green-500 h-4 rounded-full"
                                     initial={{ width: 0 }} 
                                     animate={{ width: `${stats.winRate.toFixed(2)}%` }} 
                                     transition={{ duration: 0.5 }}
@@ -791,24 +778,26 @@ const PerformancePage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
                     >
-                        <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-                                <h2 className="text-xl font-semibold text-text-primary">Trade Log</h2>
-                                <div className="flex items-center gap-2 w-full md:w-auto">
-                                    <input placeholder="Search symbols, remarks..." className="p-2 bg-surface border border-white/10 rounded-md text-sm w-full md:w-64" onChange={(e) => {/* search handled via parent state if needed */}} />
-                                    {selected.size > 0 && (
-                                        <motion.button 
-                                            onClick={handleBulkDelete} 
-                                            className="bg-red-500/80 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg flex items-center"
-                                            whileHover={{ scale: 1.05 }}
-                                            whileTap={{ scale: 0.95 }}
-                                        >
-                                            <Trash2 size={16} className="mr-2" />
-                                            Delete Selected ({selected.size})
-                                        </motion.button>
-                                    )}
-                                    <button onClick={() => { exportToCsv('performance_trades.csv', trades.map(t => ({ Date: t.date?.toDate ? t.date.toDate().toISOString() : t.date, Symbol: t.symbol, Type: t.type, Entry: t.entry, StopLoss: t.stopLoss, Target: t.target, Result: t.result, TotalPnl: t.totalPnl }))); }} className="bg-secondary text-white px-3 py-2 rounded-md">Export</button>
-                                </div>
-                            </div>
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-xl font-semibold text-text-primary">Trade Log</h2>
+                        </div>
+                        
+                        <div className="flex justify-end items-center mb-4 gap-2">
+                            <input placeholder="Search symbols, remarks..." className="p-2 bg-surface border border-white/10 rounded-md text-sm w-full md:w-64" onChange={(e) => {/* search handled via parent state if needed */}} />
+                            {selected.size > 0 && (
+                                <motion.button 
+                                    onClick={handleBulkDelete} 
+                                    className="bg-red-500/80 hover:bg-red-500 text-white font-bold py-2 px-4 rounded-lg flex items-center"
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    <Trash2 size={16} className="mr-2" />
+                                    Delete Selected ({selected.size})
+                                </motion.button>
+                            )}
+                            <button onClick={() => { exportToCsv('performance_trades.csv', trades.map(t => ({ Date: t.date?.toDate ? t.date.toDate().toISOString() : t.date, Symbol: t.symbol, Type: t.type, Entry: t.entry, StopLoss: t.stopLoss, Target: t.target, Result: t.result, TotalPnl: t.totalPnl }))); }} className="bg-secondary text-white px-3 py-2 rounded-md">Export</button>
+                        </div>
+
                         <div className="overflow-x-auto bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft">
                                 <div className="rounded-lg overflow-hidden">
                                 <table className="min-w-full text-sm">

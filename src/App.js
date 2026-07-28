@@ -22,6 +22,7 @@ import DashboardPage from './pages/DashboardPage';
 import Homepage from './pages/Homepage';
 import About from './pages/About';
 import Pricing from './pages/Pricing';
+import UserManagement from './pages/UserManagement';
 
 function App() {
   return (
@@ -54,8 +55,8 @@ function App() {
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />
-          {/* --- ADD THIS NEW ROUTE FOR RANKING --- */}
           <Route path="/ranking" element={<AdminRoute><RankingPage /></AdminRoute>} />
+          <Route path="/user-management" element={<AdminRoute><UserManagement /></AdminRoute>} />
 
         </Routes>
     </Router>

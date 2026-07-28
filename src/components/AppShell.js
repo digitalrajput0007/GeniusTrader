@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Activity, BarChart3, Bell, ChevronLeft, ChevronRight, FileText, Home, LogOut, Menu, Moon, Plus, Search, Settings, ShieldCheck, Sun, Target, User, X } from 'lucide-react';
+import { Activity, BarChart3, Bell, ChevronLeft, ChevronRight, FileText, Home, LogOut, Menu, Moon, Plus, Search, Settings, ShieldCheck, Sun, Target, User, Users, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import BrandLogo from './BrandLogo';
@@ -11,7 +11,8 @@ const navItems = [
   { label: 'Performance', to: '/performance', icon: BarChart3 },
   { label: 'Position sizing', to: '/position-sizer', icon: Target },
   { label: 'Risk management', to: '/risk-management', icon: ShieldCheck },
-  { label: 'Market analytics', to: '/ranking', icon: Activity },
+  { label: 'User Ranking', to: '/ranking', icon: Activity, adminOnly: true },
+  { label: 'User Management', to: '/user-management', icon: Users, adminOnly: true },
 ];
 
 const AppShell = ({ children }) => {
@@ -37,6 +38,14 @@ const AppShell = ({ children }) => {
   };
 
   const closeMobile = () => setMobileOpen(false);
+
+  const filteredNavItems = navItems.filter(item => {
+    if (item.adminOnly) {
+      return userData?.isAdmin;
+    }
+    return true;
+  });
+
   const sidebar = (
     <aside className={`gt-sidebar ${collapsed ? 'gt-sidebar--collapsed' : ''} ${mobileOpen ? 'gt-sidebar--open' : ''}`}>
       <div className="gt-sidebar__brand">
@@ -48,7 +57,7 @@ const AppShell = ({ children }) => {
       </div>
       <div className="gt-nav-label">{!collapsed && 'Workspace'}</div>
       <nav className="gt-navigation">
-        {navItems.map(({ label, to, icon: Icon }) => (
+        {filteredNavItems.map(({ label, to, icon: Icon }) => (
           <NavLink key={to} to={to} onClick={closeMobile} className={({ isActive }) => `gt-nav-link ${isActive ? 'gt-nav-link--active' : ''}`} title={collapsed ? label : undefined}>
             <Icon size={19} strokeWidth={2.2} />
             {!collapsed && <span>{label}</span>}

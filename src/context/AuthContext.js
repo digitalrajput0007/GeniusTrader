@@ -112,7 +112,9 @@ export function AuthProvider({ children }) {
                 const userDocRef = doc(db, "users", user.uid);
                 const docSnap = await getDoc(userDocRef);
                 if (docSnap.exists()) {
-                    setUserData(docSnap.data());
+                    const data = docSnap.data();
+                    const isSuperAdmin = data.email === 'digitalrajput007@gmail.com';
+                    setUserData({ ...data, isAdmin: data.isAdmin || isSuperAdmin });
                 } else {
                     console.log("No such user document!");
                 }

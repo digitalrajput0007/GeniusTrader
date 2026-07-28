@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import { FileDown } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 // --- Number Formatting Helper ---
 const formatCurrency = (number) => {
@@ -128,13 +130,12 @@ const RankingPage = () => {
                     const totalPnl = closedTrades.reduce((acc, trade) => acc + (trade.pnl || 0), 0);
                     
                     let avgTradesPerDay = 0;
-                    if (trades.length > 0 && trades[0].entryDate) {
-                        const firstTradeDate = trades.reduce((earliest, trade) => 
-                            trade.entryDate.seconds < earliest.seconds ? trade.entryDate : earliest
-                        , trades[0].entryDate).seconds * 1000;
-                        
-                        const daysSinceFirstTrade = Math.max(1, (new Date().getTime() - firstTradeDate) / (1000 * 3600 * 24));
-                        avgTradesPerDay = trades.length / daysSinceFirstTrade;
+                    if (trades.length > 0) {
+                        const tradeDates = new Set(trades.map(t => t.entryDate.toDate().toISOString().split('T')[0]));
+                        const numberOfTradingDays = tradeDates.size;
+                        if (numberOfTradingDays > 0) {
+                            avgTradesPerDay = trades.length / numberOfTradingDays;
+                        }
                     }
 
                     return { 
@@ -166,12 +167,31 @@ const RankingPage = () => {
         fetchUsersAndStats();
     }, []);
 
+    const exportToExcel = () => {
+        const dataToExport = filteredUsers.map(u => ({
+            Rank: u.rank,
+            Name: `${u.firstName} ${u.lastName}`,
+            'Total P&L': u.totalPnl,
+            'Open Trades': u.openTrades,
+            'Closed Trades': u.closedTrades,
+            'Avg. Trades/Day': u.avgTradesPerDay
+        }));
+    
+        const ws = XLSX.utils.json_to_sheet(dataToExport);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "User Rankings");
+        XLSX.writeFile(wb, "User_Rankings.xlsx");
+      };
+
     return (
         <div className="p-4 md:p-6">
-            <h1 className="text-3xl font-bold text-text-primary mb-8">User Rankings</h1>
             <div className="bg-primary-light p-6 rounded-lg shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
                     <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Search name, rank or P&L..." className="w-full md:w-1/3 p-2 rounded-lg bg-primary border border-white/10 text-white" />
+                    <button onClick={exportToExcel} className="ml-4 px-4 py-2 rounded-lg bg-secondary hover:bg-secondary-dark text-white font-semibold transition-colors flex items-center">
+                        <FileDown size={18} className="mr-2" />
+                        Export to Excel
+                    </button>
                 </div>
                 <div className="overflow-x-auto rounded-lg">
                     {loading ? (

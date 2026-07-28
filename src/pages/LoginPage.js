@@ -22,19 +22,6 @@ const LoginPage = () => {
     }
   }, [searchParams]);
 
-  const handleResendVerification = async () => {
-    if (!auth.currentUser) {
-      setError('You must be logged in to resend a verification email.');
-      return;
-    }
-    try {
-      await sendEmailVerification(auth.currentUser);
-      setError('A new verification email has been sent.');
-    } catch (err) {
-      setError('Failed to send verification email.');
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');

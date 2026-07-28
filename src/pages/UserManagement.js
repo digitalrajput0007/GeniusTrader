@@ -116,6 +116,19 @@ const EditUserModal = ({ user, onClose, onSave }) => {
                         <label className="block text-sm font-medium text-gray-400 mb-2">Last Name</label>
                         <input type="text" name="lastName" value={formData.lastName || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-primary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
                     </div>
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-400 mb-2">Mobile</label>
+                        <input type="text" name="mobile" value={formData.mobile || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-primary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-400 mb-2">Gender</label>
+                        <select name="gender" value={formData.gender || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-primary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
                     <div className="mb-6">
                         <label className="flex items-center cursor-pointer">
                             <input type="checkbox" name="isAdmin" checked={formData.isAdmin || false} onChange={handleChange} className="sr-only" disabled={isSuperAdmin} />
@@ -270,6 +283,8 @@ const UserManagement = () => {
     const dataToExport = processedUsers.otherUsers.map(u => ({
         Name: `${u.firstName || ''} ${u.lastName || ''}`.trim(),
         Email: u.email,
+        Mobile: u.mobile,
+        Gender: u.gender,
         Role: u.isAdmin ? 'Admin' : 'User',
         Status: u.status,
         'Created Date': u.createdAt ? u.createdAt.toLocaleDateString() : 'N/A'
@@ -300,6 +315,8 @@ const UserManagement = () => {
     <tr className="border-b border-gray-700 last:border-b-0 hover:bg-surface/60 transition-colors duration-150">
         <td className="p-3 whitespace-nowrap">{`${user.firstName || ''} ${user.lastName || ''}`}</td>
         <td className="p-3 text-gray-400 whitespace-nowrap">{user.email}</td>
+        <td className="p-3 text-gray-400 whitespace-nowrap">{user.mobile}</td>
+        <td className="p-3 text-gray-400 whitespace-nowrap">{user.gender}</td>
         <td className="p-3 text-center">
             <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${user.isAdmin ? 'bg-pink-600 text-white' : 'bg-blue-600 text-white'}`}>
                 {user.isAdmin ? 'Admin' : 'User'}
@@ -345,6 +362,8 @@ const UserManagement = () => {
                                 <tr className="bg-primary-light/60">
                                     <SortableHeader name="name" align="left">Name</SortableHeader>
                                     <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Email</th>
+                                    <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Mobile</th>
+                                    <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Gender</th>
                                     <th className="sticky top-0 text-center p-3 font-semibold bg-primary-light/60">Role</th>
                                     <SortableHeader name="status" align="center">Status</SortableHeader>
                                     <SortableHeader name="createdAt" align="center">Created Date</SortableHeader>

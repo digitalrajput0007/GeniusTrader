@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import * as XLSX from 'xlsx';
 
 const STORAGE_KEY = 'gt_upload_history_v1';
@@ -26,13 +26,15 @@ const ExcelUpload = ({ onDataUpload, createSampleExcel, uploadProgress }) => {
     }
   }, [uploadProgress]);
 
-  const saveHistory = (entry) => {
-    const newHist = [entry, ...history].slice(0, 10);
-    setHistory(newHist);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newHist)); } catch (e) {}
-  };
+  const saveHistory = useCallback((entry) => {
+    setHistory(prevHistory => {
+      const newHist = [entry, ...prevHistory].slice(0, 10);
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newHist)); } catch (e) {}
+      return newHist;
+    });
+  }, []);
 
-  const handleFile = async (file) => {
+  const handleFile = useCallback(async (file) => {
     if (!file) return;
     setFileName(file.name);
     setError('');
@@ -71,7 +73,7 @@ const ExcelUpload = ({ onDataUpload, createSampleExcel, uploadProgress }) => {
       console.error(err);
       setError('Unable to parse the selected file. Please try a CSV or Excel file.');
     }
-  };
+  }, [onDataUpload, saveHistory]);
 
   const handleFileUpload = (e) => handleFile(e.target.files?.[0]);
 
@@ -91,7 +93,7 @@ const ExcelUpload = ({ onDataUpload, createSampleExcel, uploadProgress }) => {
       div.removeEventListener('drop', onDrop);
       div.removeEventListener('dragover', onDragOver);
     };
-  }, [dropRef.current, history]);
+  }, [handleFile]);
 
   return (
     <div className="space-y-4">

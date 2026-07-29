@@ -3,7 +3,7 @@ import { db, auth } from '../firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc, Timestamp, addDoc } from 'firebase/firestore';
 import ExcelUpload from '../components/ExcelUpload';
 import * as XLSX from 'xlsx';
-import { Upload, Edit, Trash2, Check, ArrowDown, ArrowUp, CheckCircle, XCircle, MinusCircle, TrendingUp, TrendingDown, Calendar, BarChart2, Zap, Target, HelpCircle } from 'lucide-react';
+import { Upload, Edit, Trash2, Check, ArrowDown, ArrowUp, CheckCircle, XCircle, MinusCircle, TrendingUp, TrendingDown, BarChart2, Zap, Target, HelpCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AddNewTradeForm from '../components/AddNewTradeForm';
 import FourMonthCalendar from '../components/MonthlyCalendar';

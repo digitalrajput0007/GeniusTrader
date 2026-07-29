@@ -14,14 +14,6 @@ import {
   Wallet,
 } from 'lucide-react';
 
-const currency = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumFractionDigits: 0,
-});
-
-const formatCurrency = (value) => currency.format(value);
-
 const buildLinePath = (values, width = 260, height = 140, padding = 18) => {
   const max = Math.max(...values);
   const min = Math.min(...values);

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
-import { Activity, ArrowRight, BarChart3, BrainCircuit, CheckCircle2, Cloud, Eye, EyeOff, Lock, Mail, NotebookPen, ShieldAlert, Sparkles } from 'lucide-react';
+import { Activity, ArrowRight, BarChart3, BrainCircuit, Cloud, Eye, EyeOff, Lock, Mail, NotebookPen, ShieldAlert, Sparkles } from 'lucide-react';
 
 const LoginPage = () => {
   const navigate = useNavigate();

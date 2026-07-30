@@ -155,7 +155,7 @@ const SignupPage = () => {
                 </div>
                 <div className="relative">
                   <UserRound size={16} className="pointer-events-none absolute left-3 top-[14px] text-slate-500" />
-                  <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} className="w-full rounded-[16px] border border-white/10 bg-slate-900/80 py-3 pl-10 pr-4 text-sm text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" required />
+                  <input type="text" name="lastName" placeholder="Last name" value={formData.lastName} onChange={handleChange} className="w-full rounded-[16px] border border-white/10 bg-slate-900/80 py-3 pl-10 pr-4 text-sm text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" />
                 </div>
               </div>
               <div className="relative">
@@ -163,7 +163,7 @@ const SignupPage = () => {
                 <input type="email" name="email" placeholder="Email address" value={formData.email} onChange={handleChange} className="w-full rounded-[16px] border border-white/10 bg-slate-900/80 py-3 pl-10 pr-4 text-sm text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" required />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
-                <input type="tel" name="mobile" placeholder="Mobile number" value={formData.mobile} onChange={handleChange} className="w-full rounded-[16px] border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" />
+                <input type="tel" name="mobile" placeholder="Mobile number" value={formData.mobile} onChange={handleChange} className="w-full rounded-[16px] border border-white/10 bg-slate-900/80 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20" required />
                 <select name="gender" value={formData.gender} onChange={handleChange} className={`w-full rounded-[16px] border border-white/10 bg-slate-900/80 px-4 py-3 text-sm outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 ${formData.gender ? 'text-white' : 'text-slate-400'}`} required>
                   <option value="" disabled>Select gender</option>
                   <option value="Male">Male</option>
@@ -186,7 +186,7 @@ const SignupPage = () => {
                 </button>
               </div>
               <label className="flex items-start gap-3 rounded-[16px] border border-white/10 bg-slate-900/60 p-3 text-sm text-slate-400">
-                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-4 w-4 rounded border-white/10 bg-slate-900 text-cyan-400" />
+                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} className="mt-1 h-4 w-4 rounded border-white/10 bg-slate-900 text-cyan-400" required />
                 <span>I agree to the <button type="button" className="font-medium text-cyan-300 transition hover:text-cyan-200" onClick={() => toast('Terms and Conditions page is not yet implemented.')}>Terms and Conditions</button></span>
               </label>
               <button type="submit" disabled={isSigningUp || !isPasswordValid} className="flex w-full items-center justify-center gap-2 rounded-[16px] bg-gradient-to-r from-cyan-400 to-emerald-400 px-4 py-3.5 font-semibold text-slate-950 transition duration-300 hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70">

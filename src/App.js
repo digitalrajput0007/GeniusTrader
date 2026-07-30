@@ -42,7 +42,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           {/* Private User Routes */}
-          <Route path="/" element={<Homepage />} />
+          <Route path="/" element={<Navigate to="/performance" replace />} />
           <Route path="/position-sizer" element={<ProtectedRoute><PositionSizerPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/paper-trades" element={<ProtectedRoute><PaperTradePage /></ProtectedRoute>} />
@@ -51,7 +51,7 @@ function App() {
           <Route path="/currency-converter" element={<ProtectedRoute><CurrencyConverterPage /></ProtectedRoute>} />
           <Route path="/risk-management" element={<ProtectedRoute><RiskManagementPage /></ProtectedRoute>} />
           <Route path="/performance" element={<ProtectedRoute><PerformancePage /></ProtectedRoute>} />
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<Navigate to="/performance" replace />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminRoute><AdminPage /></AdminRoute>} />

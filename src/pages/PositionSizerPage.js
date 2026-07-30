@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/PositionSizerPage.css';
 
 const PositionSizerPage = () => {
     const [formData, setFormData] = useState({
@@ -50,9 +51,9 @@ const PositionSizerPage = () => {
     };
 
     return (
-        <div>
+        <div className="position-sizer-page-box">
             <h1 className="text-3xl font-bold text-text-primary mb-8 md:hidden">Position Size Calculator</h1>
-            <div className="bg-primary-light p-8 rounded-lg shadow-lg max-w-lg mx-auto border border-gray-700">
+            <div className="bg-primary-light p-8 rounded-lg shadow-lg max-w-lg mx-auto border border-gray-700 position-sizer-page-box">
                 <div className="space-y-6">
                     <div>
                         <label htmlFor="capital" className="block text-sm font-medium text-text-secondary mb-1">Account Capital (₹)</label>

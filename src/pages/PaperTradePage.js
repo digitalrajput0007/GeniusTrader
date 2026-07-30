@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { db } from '../firebase';
 import { collection, addDoc, query, onSnapshot, doc, updateDoc, deleteDoc, orderBy } from 'firebase/firestore';
 import toast from 'react-hot-toast';
+import '../styles/PaperTradePage.css';
 
 // --- SVG Icons for Buttons ---
 const EditIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" /></svg>;
@@ -446,7 +447,7 @@ const PaperTradePage = () => {
         <div className="p-4 md:p-6">
             <h1 className="text-3xl font-bold text-text-primary mb-8 md:hidden">Dashboard</h1>
             
-            <div className="bg-primary-light p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
+            <div className="bg-primary-light p-6 rounded-lg shadow-lg mb-8 border border-gray-700 trade-page-box">
                 <h2 className="text-xl font-semibold text-text-primary mb-4">Trade Statistics</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                     
@@ -477,7 +478,7 @@ const PaperTradePage = () => {
                 </div>
             </div>
 
-            <div className="bg-primary-light p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
+            <div className="bg-primary-light p-6 rounded-lg shadow-lg mb-8 border border-gray-700 trade-page-box">
                 <h2 className="text-xl font-semibold text-text-primary mb-4">Enter a New Trade</h2>
                 <form onSubmit={handleNewTrade} className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
                     <select name="type" value={formData.type} onChange={handleChange} className="p-3 bg-primary rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-secondary transition text-white">
@@ -493,7 +494,7 @@ const PaperTradePage = () => {
                 </form>
             </div>
 
-            <div className="bg-primary-light p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
+            <div className="bg-primary-light p-6 rounded-lg shadow-lg mb-8 border border-gray-700 trade-page-box">
                 <h2 className="text-xl font-semibold text-text-primary mb-4">Open Positions</h2>
                 <div className="overflow-x-auto">
                             {loading ? <p className="text-text-secondary">Loading...</p> : openPositions.length > 0 ? (<>
@@ -567,7 +568,7 @@ const PaperTradePage = () => {
                 </div>
             </div>
 
-            <div className="bg-primary-light p-6 rounded-lg shadow-lg mb-8 border border-gray-700">
+            <div className="bg-primary-light p-6 rounded-lg shadow-lg mb-8 border border-gray-700 trade-page-box">
                 <h2 className="text-xl font-semibold text-text-primary mb-4">Trade History</h2>
                 <div className="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0">
                     <input

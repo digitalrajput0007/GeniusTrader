@@ -10,6 +10,7 @@ import FourMonthCalendar from '../components/MonthlyCalendar';
 import { ResponsiveLine } from '@nivo/line';
 import { motion, animate } from 'framer-motion';
 import { buildTradePayload } from '../utils/tradeImport';
+import '../styles/PerformancePage.css';
 
 // --- CSV Export Helper ---
 const exportToCsv = (filename, rows) => {
@@ -631,7 +632,7 @@ const PerformancePage = () => {
                     </div>
 
                     <motion.div 
-                        className="bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft mb-6"
+                        className="bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft mb-6 performance-page-box"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
@@ -666,7 +667,7 @@ const PerformancePage = () => {
                     </motion.div>
 
                     <motion.div 
-                        className="bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft mb-6"
+                        className="bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft mb-6 performance-page-box"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
@@ -763,7 +764,7 @@ const PerformancePage = () => {
                     </div>
 
                     <motion.div 
-                        className="bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft mb-6"
+                        className="bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft mb-6 performance-page-box"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
@@ -777,6 +778,7 @@ const PerformancePage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4 }}
+                        className="performance-page-box"
                     >
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-xl font-semibold text-text-primary">Trade Log</h2>

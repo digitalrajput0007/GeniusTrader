@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Timestamp, addDoc, collection } from 'firebase/firestore';
 import { db } from '../firebase';
 import toast from 'react-hot-toast';
@@ -15,6 +15,16 @@ const AddNewTradeForm = ({ currentUser, onTradeAdded }) => {
     totalPnl: ''
   });
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const entryPrice = parseFloat(formData.entry);
+    if (!isNaN(entryPrice)) {
+      const calculatedStopLoss = formData.type === 'Long' ? entryPrice - 20 : entryPrice + 20;
+      setFormData(prev => ({ ...prev, stopLoss: calculatedStopLoss.toFixed(2) }));
+    } else {
+      setFormData(prev => ({ ...prev, stopLoss: '' }));
+    }
+  }, [formData.entry, formData.type]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -85,7 +95,7 @@ const AddNewTradeForm = ({ currentUser, onTradeAdded }) => {
           <option>NPNL</option>
         </select>
         <input name="entry" type="number" step="0.01" value={formData.entry} onChange={handleChange} placeholder="Entry" className="rounded-lg border border-white/10 bg-primary p-2 text-text-primary outline-none" />
-        <input name="stopLoss" type="number" step="0.01" value={formData.stopLoss} onChange={handleChange} placeholder="Stop Loss" className="rounded-lg border border-white/10 bg-primary p-2 text-text-primary outline-none" />
+        <input name="stopLoss" type="number" step="0.01" value={formData.stopLoss} onChange={handleChange} placeholder="Stop Loss" className="rounded-lg border border-white/10 bg-primary p-2 text-text-primary outline-none" readOnly />
         <input name="target" type="number" step="0.01" value={formData.target} onChange={handleChange} placeholder="Target" className="rounded-lg border border-white/10 bg-primary p-2 text-text-primary outline-none" />
         <input name="totalPnl" type="number" step="0.01" value={formData.totalPnl} onChange={handleChange} placeholder="Total P&L" className="rounded-lg border border-white/10 bg-primary p-2 text-text-primary outline-none" />
       </div>

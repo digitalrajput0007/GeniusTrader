@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import '../styles/RiskManagementPage.css';
 
 // --- Reusable UI Components ---
 const InputGroup = ({ label, children }) => (
@@ -87,7 +88,7 @@ const RiskManagementPage = () => {
     }, [capital, dailyRiskPercent, maxTrades, lotSize, riskRatio, rewardRatio]);
 
     return (
-        <div className="p-4 md:p-6">
+        <div className="p-4 md:p-6 risk-management-page-box">
             <h1 className="text-3xl font-bold text-text-primary mb-8 md:hidden">Risk & Money Management</h1>
 
             {/* --- Main Inputs (Updated) --- */}
@@ -132,7 +133,7 @@ const RiskManagementPage = () => {
                        <OutputBox label="Target Points" value={calculations.targetPoints.toFixed(2)} />
                     </div>
                     
-                    <div className="bg-primary-light p-6 rounded-lg shadow-lg border border-gray-700">
+                    <div className="bg-primary-light p-6 rounded-lg shadow-lg border border-gray-700 risk-management-page-box">
                         <h3 className="text-xl font-semibold text-text-primary mb-4 text-center">Risk / Reward Ratio</h3>
                         <div className="flex items-center justify-center gap-4">
                             <InputGroup label="Risk">

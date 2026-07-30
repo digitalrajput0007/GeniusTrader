@@ -1,0 +1,8 @@
+@media (max-width: 768px) {
+  .portfolio-page-box {
+    padding: 1rem;
+  }
+  .portfolio-title {
+    font-size: 1.5rem;
+  }
+}

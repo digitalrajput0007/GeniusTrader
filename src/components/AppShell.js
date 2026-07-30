@@ -6,9 +6,8 @@ import { useTheme } from '../context/ThemeContext';
 import BrandLogo from './BrandLogo';
 
 const navItems = [
-  { label: 'Overview', to: '/dashboard', icon: Home },
-  { label: 'Trade journal', to: '/paper-trades', icon: FileText },
   { label: 'Performance', to: '/performance', icon: BarChart3 },
+  { label: 'Trade journal', to: '/paper-trades', icon: FileText },
   { label: 'Position sizing', to: '/position-sizer', icon: Target },
   { label: 'Risk management', to: '/risk-management', icon: ShieldCheck },
   { label: 'User Ranking', to: '/ranking', icon: Activity, adminOnly: true },
@@ -65,7 +64,7 @@ const AppShell = ({ children }) => {
         ))}
       </nav>
       <div className="gt-sidebar__bottom">
-        <Link to="/change-password" className="gt-nav-link" title={collapsed ? 'Settings' : undefined}><Settings size={19} />{!collapsed && <span>Settings</span>}</Link>
+        
       </div>
     </aside>
   );

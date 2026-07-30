@@ -161,7 +161,7 @@ const UserManagement = () => {
   const [editingUser, setEditingUser] = useState(null);
 
   const fetchUsers = useCallback(async () => {
-    if(!loading) setLoading(true);
+    setLoading(true);
     try {
       const usersCollection = collection(db, 'users');
       const userSnapshot = await getDocs(usersCollection);
@@ -183,7 +183,7 @@ const UserManagement = () => {
     } finally {
       setLoading(false);
     }
-  }, [loading]);
+  }, []);
 
   useEffect(() => {
     fetchUsers();

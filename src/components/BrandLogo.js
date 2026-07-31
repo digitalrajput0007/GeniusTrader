@@ -1,5 +1,3 @@
-import React from 'react';
-
 const BrandLogo = ({ compact = false, className = '' }) => (
   <div className={`flex items-center gap-3 ${className}`} aria-label="Genius Trader">
     <div className="gt-mark" aria-hidden="true">

@@ -6,7 +6,7 @@ import * as XLSX from 'xlsx';
 import { Upload, Edit, Trash2, Check, ArrowDown, ArrowUp, CheckCircle, XCircle, MinusCircle, TrendingUp, BarChart2, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AddNewTradeForm from '../components/AddNewTradeForm';
-import FourMonthCalendar from '../components/MonthlyCalendar';
+import MonthlyCalendar from '../components/MonthlyCalendar';
 import { ResponsiveLine } from '@nivo/line';
 import { motion, animate } from 'framer-motion';
 import { buildTradePayload } from '../utils/tradeImport';
@@ -41,6 +41,8 @@ const PerformancePage = () => {
     const [selectedMonth, setSelectedMonth] = useState('All');
     const [timeRange, setTimeRange] = useState('This Month');
     const [customDate, setCustomDate] = useState({ startDate: '', endDate: '' });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rowsPerPage, setRowsPerPage] = useState(25);
 
     const headers = ["Date", "Symbol", "Type", "Entry", "Stop Loss", "Target", "Result", "Total P&L"];
 
@@ -325,6 +327,17 @@ const PerformancePage = () => {
         }
         return sortableItems;
     }, [trades, sortConfig]);
+
+    const paginatedTrades = useMemo(() => {
+        if (rowsPerPage === 0) return sortedTrades;
+        const startIndex = (currentPage - 1) * rowsPerPage;
+        return sortedTrades.slice(startIndex, startIndex + rowsPerPage);
+    }, [sortedTrades, currentPage, rowsPerPage]);
+
+    const totalPages = useMemo(() => {
+        if (rowsPerPage === 0) return 1;
+        return Math.ceil(sortedTrades.length / rowsPerPage);
+    }, [sortedTrades, rowsPerPage]);
 
 
     const handleSort = (key) => {
@@ -864,7 +877,7 @@ const PerformancePage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
                     >
-                       <FourMonthCalendar trades={trades} />
+                       <MonthlyCalendar trades={trades} />
                     </motion.div>
 
                     <AddNewTradeForm currentUser={currentUser} onTradeAdded={onTradeAdded} />
@@ -918,7 +931,7 @@ const PerformancePage = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="text-text-primary">
-                                    {sortedTrades.map(trade => (
+                                    {paginatedTrades.map(trade => (
                                         <tr key={trade.id} className={`border-b ${selected.has(trade.id) ? 'bg-primary/20' : 'hover:bg-surface/70'} transition-colors rounded-md`}>
                                             <td className="p-3 text-center"><input type="checkbox" checked={selected.has(trade.id)} onChange={() => toggleSelect(trade.id)} className="bg-surface border-white/20 rounded"/></td>
                                             {headers.map(header => renderCell(trade, header))}
@@ -936,6 +949,23 @@ const PerformancePage = () => {
                                     ))}
                                 </tbody>
                             </table>
+                            </div>
+                        </div>
+                        <div className="flex justify-between items-center mt-4">
+                            <div className="text-sm text-text-secondary">
+                                Showing {paginatedTrades.length} of {sortedTrades.length} trades
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <select value={rowsPerPage} onChange={e => { setRowsPerPage(Number(e.target.value)); setCurrentPage(1); }} className="bg-surface border-white/10 border text-sm rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary text-slate-200">
+                                    <option value={25}>25</option>
+                                    <option value={50}>50</option>
+                                    <option value={100}>100</option>
+                                    <option value={250}>250</option>
+                                    <option value={0}>All</option>
+                                </select>
+                                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} className="px-3 py-1 rounded-md bg-surface border-white/10 border disabled:opacity-50">Previous</button>
+                                <span className="text-sm">Page {currentPage} of {totalPages}</span>
+                                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} className="px-3 py-1 rounded-md bg-surface border-white/10 border disabled:opacity-50">Next</button>
                             </div>
                         </div>
                     </motion.div>

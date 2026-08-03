@@ -41,24 +41,41 @@ const CalendarMonth = ({ date, dailyPnl, maximum, onDayEnter, onDayLeave }) => {
   </section>;
 };
 
-const FourMonthCalendar = ({ trades = [] }) => {
+const MonthlyCalendar = ({ trades = [] }) => {
   const [tooltip, setTooltip] = useState(null);
-  const { dailyPnl, maximum, latestMonth } = useMemo(() => {
+  const { dailyPnl, maximum, latestMonth, tradeMonths, firstMonth } = useMemo(() => {
     const daily = {};
-    let latest = new Date();
+    let latest = new Date(0);
+    let first = new Date();
+    const monthsWithTrades = new Set();
     trades.forEach((trade) => {
       const date = toLocalDate(trade.date);
       if (!date) return;
       const key = dayKey(date);
       daily[key] = (daily[key] || 0) + Number(trade.totalPnl || 0);
       if (date > latest) latest = date;
+      if (date < first) first = date;
+      monthsWithTrades.add(monthKey(date));
     });
-    return { dailyPnl: daily, maximum: Math.max(1, ...Object.values(daily).map((value) => Math.abs(value))), latestMonth: new Date(latest.getFullYear(), latest.getMonth(), 1) };
+    return { dailyPnl: daily, maximum: Math.max(1, ...Object.values(daily).map((value) => Math.abs(value))), latestMonth: new Date(latest.getFullYear(), latest.getMonth(), 1), tradeMonths: monthsWithTrades, firstMonth: new Date(first.getFullYear(), first.getMonth(), 1) };
   }, [trades]);
   const [anchorOffset, setAnchorOffset] = useState(0);
   const anchor = new Date(latestMonth.getFullYear(), latestMonth.getMonth() + anchorOffset, 1);
-  const months = Array.from({ length: 6 }, (_, index) => new Date(anchor.getFullYear(), anchor.getMonth() - 3 + index, 1));
-  const rangeLabel = `${months[0].toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })} – ${months[5].toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}`;
+  const months = Array.from({ length: 6 }, (_, index) => new Date(anchor.getFullYear(), anchor.getMonth() - 5 + index, 1));
+  const tradeMonthsInRange = months.filter(month => tradeMonths.has(monthKey(month)));
+  const rangeLabel = tradeMonthsInRange.length > 0 ? `${tradeMonthsInRange[0].toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })} – ${tradeMonthsInRange[tradeMonthsInRange.length - 1].toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}` : 'No trades';
+
+  const handlePrev = () => {
+    const remainingMonths = Math.floor((anchor.getTime() - firstMonth.getTime()) / (1000 * 60 * 60 * 24 * 30));
+    const offset = remainingMonths > 6 ? 6 : 1;
+    setAnchorOffset((value) => value - offset);
+    setTooltip(null);
+  };
+
+  const handleNext = () => {
+    setAnchorOffset((value) => value + 6);
+    setTooltip(null);
+  };
 
   const showTooltip = (event, date, pnl) => {
     const bounds = event.currentTarget.closest('.gt-heatmap')?.getBoundingClientRect();
@@ -67,10 +84,10 @@ const FourMonthCalendar = ({ trades = [] }) => {
   };
 
   return <section className="gt-heatmap" aria-label="Daily profit and loss calendar">
-    <div className="gt-heatmap__topline"><div><p className="gt-heatmap__eyebrow">DAILY PERFORMANCE</p><h2>Trading calendar</h2></div><div className="gt-heatmap__controls"><span>{rangeLabel}</span><button type="button" onClick={() => { setAnchorOffset((value) => value - 1); setTooltip(null); }} aria-label="View previous months" title="Previous months"><ChevronLeft size={16} /></button><button type="button" onClick={() => { setAnchorOffset((value) => value + 1); setTooltip(null); }} aria-label="View following months" title="Following months"><ChevronRight size={16} /></button></div><div className="gt-heatmap__legend"><span><i className="profit-low" /> Profit</span><span><i className="loss-low" /> Loss</span><span><i className="empty" /> No trades</span></div></div>
+    <div className="gt-heatmap__topline"><div><p className="gt-heatmap__eyebrow">DAILY PERFORMANCE</p><h2>Trading calendar</h2></div><div className="gt-heatmap__controls"><span>{rangeLabel}</span><button type="button" onClick={handlePrev} aria-label="View previous months" title="Previous months"><ChevronLeft size={16} /></button><button type="button" onClick={handleNext} aria-label="View following months" title="Following months"><ChevronRight size={16} /></button></div><div className="gt-heatmap__legend"><span><i className="profit-low" /> Profit</span><span><i className="loss-low" /> Loss</span><span><i className="empty" /> No trades</span></div></div>
     <div className="gt-heatmap__months">{months.map((month) => <CalendarMonth key={monthKey(month)} date={month} dailyPnl={dailyPnl} maximum={maximum} onDayEnter={showTooltip} onDayLeave={() => setTooltip(null)} />)}</div>
-    {tooltip && <div className={`gt-heatmap-tooltip ${tooltip.pnl >= 0 ? 'is-profit' : 'is-loss'}`} style={{ left: tooltip.x, top: tooltip.y }} role="status"><strong>{signedMoney(tooltip.pnl)}</strong><span>{tooltip.date.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span></div>}
+    {tooltip && <div className={`gt-heatmap-tooltip ${tooltip.pnl >= 0 ? 'is-profit' : 'is-loss'}`} style={{ left: tooltip.x, top: tooltip.y, transform: 'translate(-50%, -100%)' }} role="status"><strong>{signedMoney(tooltip.pnl)}</strong><span>{tooltip.date.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</span></div>}
   </section>;
 };
 
-export default FourMonthCalendar;
+export default MonthlyCalendar;

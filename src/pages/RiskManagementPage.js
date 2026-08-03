@@ -3,14 +3,14 @@ import '../styles/RiskManagementPage.css';
 
 // --- Reusable UI Components ---
 const InputGroup = ({ label, children }) => (
-    <div className="bg-surface border border-gray-700 rounded-lg flex items-center shadow-sm">
-        <span className="py-3 px-4 text-sm font-semibold text-text-secondary border-r border-gray-700 whitespace-nowrap">{label}</span>
+    <div className="bg-surface border border-slate-200 dark:border-slate-700 rounded-lg flex items-center shadow-sm">
+        <span className="py-3 px-4 text-sm font-semibold text-text-secondary border-r border-slate-200 dark:border-slate-700 whitespace-nowrap">{label}</span>
         {children}
     </div>
 );
 
 const OutputBox = ({ label, value, unit, large = false }) => (
-    <div className="bg-surface border border-gray-700 rounded-lg p-4 text-center shadow-sm h-full flex flex-col justify-center">
+    <div className="bg-surface border border-slate-200 dark:border-slate-700 rounded-lg p-4 text-center shadow-sm h-full flex flex-col justify-center">
         <p className="text-sm font-medium text-text-secondary">{label}</p>
         <p className={`font-bold text-text-primary ${large ? 'text-5xl mt-2' : 'text-3xl mt-1'}`}>
             {unit}{value}
@@ -19,18 +19,49 @@ const OutputBox = ({ label, value, unit, large = false }) => (
 );
 
 const PieChart = ({ percentage }) => {
-    const angle = (percentage / 100) * 360;
+    const r = 85;
+    const sw = 30;
+    const circ = 2 * Math.PI * r;
+    const clampedPercentage = Math.max(0, Math.min(100, percentage));
+    const offset = circ - (clampedPercentage / 100) * circ;
+
     return (
         <div className="flex flex-col items-center">
-            <div 
-                className="w-48 h-48 rounded-full flex items-center justify-center transition-all duration-500"
-                style={{ background: `conic-gradient(#22c55e ${angle}deg, #374151 ${angle}deg)` }}
-            >
-                <div className="w-32 h-32 bg-surface rounded-full flex items-center justify-center">
-                    <span className="text-3xl font-bold text-text-primary">{percentage.toFixed(0)}%</span>
+            <div className="relative w-48 h-48">
+                <svg className="w-full h-full absolute" viewBox="0 0 200 200">
+                     {/* Track */}
+                     <circle
+                        className="text-slate-200 dark:text-slate-700"
+                        stroke="currentColor"
+                        strokeWidth={sw}
+                        fill="transparent"
+                        r={r}
+                        cx="100"
+                        cy="100"
+                    />
+                    {/* Progress */}
+                    <circle
+                        className="text-emerald-500"
+                        stroke="currentColor"
+                        strokeWidth={sw}
+                        strokeDasharray={circ}
+                        strokeDashoffset={offset}
+                        strokeLinecap="round"
+                        fill="transparent"
+                        r={r}
+                        cx="100"
+                        cy="100"
+                        style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%', transition: 'stroke-dashoffset 0.5s ease-out' }}
+                    />
+                </svg>
+                {/* Center */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-32 h-32 bg-surface rounded-full flex items-center justify-center">
+                         <span className="text-3xl font-bold text-text-primary">{clampedPercentage.toFixed(0)}%</span>
+                    </div>
                 </div>
             </div>
-            <p className="mt-3 font-semibold text-green-400">Win % You Need</p>
+            <p className="mt-3 font-semibold text-emerald-400">Win % You Need</p>
         </div>
     );
 };
@@ -133,7 +164,7 @@ const RiskManagementPage = () => {
                        <OutputBox label="Target Points" value={calculations.targetPoints.toFixed(2)} />
                     </div>
                     
-                    <div className="bg-surface p-6 rounded-lg shadow-lg border border-gray-700 risk-management-page-box">
+                    <div className="bg-surface p-6 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 risk-management-page-box">
                         <h3 className="text-xl font-semibold text-text-primary mb-4 text-center">Risk / Reward Ratio</h3>
                         <div className="flex items-center justify-center gap-4">
                             <InputGroup label="Risk">

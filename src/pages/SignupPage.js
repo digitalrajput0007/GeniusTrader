@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { ArrowRight, CheckCircle2, Eye, EyeOff, Lock, Mail, UserRound, XCircle } from 'lucide-react';
 import BrandLogo from '../components/BrandLogo';
+import AnimatedAuthBackground from '../components/AnimatedAuthBackground';
 
 const PasswordStrengthMeter = ({ validation }) => {
   const { length, uppercase, lowercase, number, specialChar } = validation;
@@ -84,8 +85,9 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.14),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.15),_transparent_28%),#020617] px-3 py-4 text-slate-100 sm:px-5 lg:px-6 flex items-center justify-center">
-        <div className="w-full max-w-xl rounded-[20px] border border-white/10 bg-slate-950/70 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)] sm:p-8">
+    <div className="min-h-screen px-3 py-4 text-slate-100 sm:px-5 lg:px-6 flex items-center justify-center relative">
+        <AnimatedAuthBackground />
+        <div className="relative z-10 w-full max-w-xl rounded-[20px] border border-white/10 bg-slate-950/70 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)] sm:p-8">
             <div className="mb-6 flex items-center gap-3">
               <BrandLogo />
             </div>

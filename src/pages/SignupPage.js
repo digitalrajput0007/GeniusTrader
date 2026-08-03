@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Activity, ArrowRight, BarChart3, BrainCircuit, CheckCircle2, Cloud, Eye, EyeOff, Lock, Mail, NotebookPen, ShieldAlert, Sparkles, UserRound, XCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Eye, EyeOff, Lock, Mail, UserRound, XCircle } from 'lucide-react';
+import BrandLogo from '../components/BrandLogo';
 
 const PasswordStrengthMeter = ({ validation }) => {
   const { length, uppercase, lowercase, number, specialChar } = validation;
@@ -82,69 +83,16 @@ const SignupPage = () => {
     }
   };
 
-  const featureItems = [
-    { icon: BrainCircuit, label: 'AI Trading Analytics' },
-    { icon: BarChart3, label: 'Performance Dashboard' },
-    { icon: NotebookPen, label: 'Trading Journal' },
-    { icon: ShieldAlert, label: 'Risk Analysis' },
-    { icon: Cloud, label: 'Cloud Sync' },
-  ];
-
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.14),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.15),_transparent_28%),#020617] px-3 py-4 text-slate-100 sm:px-5 lg:px-6">
-      <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-7xl overflow-hidden rounded-[24px] border border-white/10 bg-slate-900/60 shadow-[0_35px_120px_rgba(2,6,23,0.55)] backdrop-blur-2xl lg:rounded-[28px]">
-        <div className="relative hidden w-[48%] flex-col justify-between overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-8 lg:flex">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,_rgba(34,211,238,0.2),_transparent_25%),radial-gradient(circle_at_80%_70%,_rgba(34,197,94,0.18),_transparent_30%)]" />
-          <div className="relative z-10">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-500/10 px-3 py-2 text-sm text-cyan-200">
-              <Sparkles size={16} />
-              Built for modern traders
-            </div>
-            <h1 className="max-w-lg text-4xl font-semibold tracking-tight text-white sm:text-[2.6rem] leading-tight">
-              Master Your Trading Performance
-            </h1>
-            <p className="mt-4 max-w-lg text-base leading-7 text-slate-400">
-              Turn every trade into a sharper insight with real-time analytics, journal clarity, and risk intelligence in one premium workspace.
-            </p>
-          </div>
-
-          <div className="relative z-10 rounded-[24px] border border-white/10 bg-white/5 p-5 shadow-[0_18px_50px_rgba(2,6,23,0.2)] backdrop-blur-xl">
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-emerald-400 text-slate-950">
-                <Activity size={20} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-white">Trading command center</p>
-                <p className="text-sm text-slate-400">From setup to review in seconds</p>
-              </div>
-            </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {featureItems.map(({ icon: Icon, label }) => (
-                <div key={label} className="flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/40 px-3 py-2 text-sm text-slate-300">
-                  <Icon size={15} className="text-cyan-300" />
-                  <span>{label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-1 items-center justify-center p-4 sm:p-6 lg:p-8">
-          <div className="w-full max-w-xl rounded-[20px] border border-white/10 bg-slate-950/70 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)] sm:p-8">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(34,211,238,0.14),_transparent_24%),radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.15),_transparent_28%),#020617] px-3 py-4 text-slate-100 sm:px-5 lg:px-6 flex items-center justify-center">
+        <div className="w-full max-w-xl rounded-[20px] border border-white/10 bg-slate-950/70 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.28)] backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.35)] sm:p-8">
             <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-emerald-400 text-slate-950">
-                <Sparkles size={20} />
-              </div>
-              <div>
-                <p className="text-lg font-semibold text-white">TradePilot</p>
-                <p className="text-sm text-slate-400">Performance OS</p>
-              </div>
+              <BrandLogo />
             </div>
 
             <div className="mb-6">
               <p className="text-sm font-medium uppercase tracking-[0.24em] text-cyan-300">Create account</p>
               <h2 className="mt-2 text-3xl font-semibold text-white">Start your premium journey</h2>
-              <p className="mt-2 text-sm text-slate-400">A faster, clearer way to track every trade and decision.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -200,8 +148,6 @@ const SignupPage = () => {
               <Link to="/login" className="font-semibold text-cyan-300 transition hover:text-cyan-200">Sign in</Link>
             </p>
           </div>
-        </div>
-      </div>
     </div>
   );
 };

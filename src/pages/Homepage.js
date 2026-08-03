@@ -14,6 +14,7 @@ const features = [
 const Homepage = () => {
   const { theme, toggleTheme } = useTheme();
   return <div className="gt-marketing">
+    <title>Genius Trader | Homepage</title>
     <header className="gt-public-nav">
       <Link to="/" aria-label="Genius Trader home"><BrandLogo /></Link>
       <nav><Link to="/about">Why Genius Trader</Link><Link to="/pricing">Pricing</Link></nav>

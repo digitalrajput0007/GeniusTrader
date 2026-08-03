@@ -130,49 +130,80 @@ const PerformancePage = () => {
 
     const streakData = useMemo(() => {
         if (trades.length === 0) {
-            return { currentWinningStreak: 0, bestWinningStreak: 0, currentLosingStreak: 0, worstLosingStreak: 0 };
+            return {
+                currentWinningStreak: 0,
+                bestWinningStreak: 0,
+                winningStreakPnl: 0,
+                currentLosingStreak: 0,
+                worstLosingStreak: 0,
+                losingStreakPnl: 0
+            };
         }
     
         const sorted = [...trades].sort((a, b) => a.date.toDate() - b.date.toDate());
     
         let currentWinningStreak = 0;
         let bestWinningStreak = 0;
+        let currentWinningPnl = 0;
+        let bestWinningStreakPnl = 0;
+
         let currentLosingStreak = 0;
         let worstLosingStreak = 0;
+        let currentLosingPnl = 0;
+        let worstLosingStreakPnl = 0;
 
         sorted.forEach(trade => {
             if (trade.result === 'Profit') {
                 currentLosingStreak = 0;
+                currentLosingPnl = 0;
                 currentWinningStreak++;
+                currentWinningPnl += trade.totalPnl;
             } else if (trade.result === 'Loss') {
                 currentWinningStreak = 0;
+                currentWinningPnl = 0;
                 currentLosingStreak++;
-            } else {
+                currentLosingPnl += trade.totalPnl;
+            } else { // NPNL
+                // Reset both streaks on NPNL
                 currentWinningStreak = 0;
+                currentWinningPnl = 0;
                 currentLosingStreak = 0;
+                currentLosingPnl = 0;
             }
     
             if (currentWinningStreak > bestWinningStreak) {
                 bestWinningStreak = currentWinningStreak;
+                bestWinningStreakPnl = currentWinningPnl;
             }
             if (currentLosingStreak > worstLosingStreak) {
                 worstLosingStreak = currentLosingStreak;
+                worstLosingStreakPnl = currentLosingPnl;
             }
         });
 
-        const lastTrade = sorted[sorted.length - 1];
         let finalCurrentWinning = 0;
         let finalCurrentLosing = 0;
 
-        if(lastTrade.result === 'Profit') finalCurrentWinning = currentWinningStreak;
-        if(lastTrade.result === 'Loss') finalCurrentLosing = currentLosingStreak;
-
+        for (let i = sorted.length - 1; i >= 0; i--) {
+            const trade = sorted[i];
+            if (trade.result === 'Profit') {
+                if(finalCurrentLosing > 0) break;
+                finalCurrentWinning++;
+            } else if (trade.result === 'Loss') {
+                if(finalCurrentWinning > 0) break;
+                finalCurrentLosing++;
+            } else {
+                break; // NPNL or other results break the streak
+            }
+        }
 
         return { 
             currentWinningStreak: finalCurrentWinning,
             bestWinningStreak: bestWinningStreak,
+            winningStreakPnl: bestWinningStreakPnl,
             currentLosingStreak: finalCurrentLosing,
-            worstLosingStreak: worstLosingStreak
+            worstLosingStreak: worstLosingStreak,
+            losingStreakPnl: worstLosingStreakPnl,
          };
     }, [trades]);
 
@@ -752,16 +783,80 @@ const PerformancePage = () => {
                         ) : <p className="text-center text-text-secondary py-16">No data available for this period.</p>}
                     </motion.div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                        <StatCard title="Winning Streak" value={`${streakData.currentWinningStreak} (Best: ${streakData.bestWinningStreak})`} icon={Zap} isLoading={!trades.length} />
-                        <StatCard title="Losing Streak" value={`${streakData.currentLosingStreak} (Worst: ${streakData.worstLosingStreak})`} icon={Zap} isLoading={!trades.length} />
-                        <StatCard title="Best P&L Month" value={kpis.bestPnl} icon={TrendingUp} isLoading={!trades.length} />
-                        <StatCard title="Worst P&L Month" value={kpis.worstPnl} icon={TrendingDown} isLoading={!trades.length} />
-                        <StatCard title="Best Accuracy Month" value={kpis.bestAccuracy} icon={Target} isLoading={!trades.length} />
-                        <StatCard title="Worst Accuracy Month" value={kpis.worstAccuracy} icon={HelpCircle} isLoading={!trades.length} />
-                        <StatCard title="Long Net" value={`₹${Math.round(longShortData.longNet).toLocaleString('en-IN')}`} icon={BarChart2} isLoading={!trades.length} />
-                        <StatCard title="Short Net" value={`₹${Math.round(longShortData.shortNet).toLocaleString('en-IN')}`} icon={BarChart2} isLoading={!trades.length} />
-                    </div>
+                    <motion.div
+                        className="bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft mb-6 performance-page-box"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.25 }}
+                    >
+                        <h2 className="text-xl font-semibold text-text-primary mb-4">Performance Highlights</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {/* Streaks Card */}
+                            <div className="bg-surface p-5 rounded-xl border border-white/10 shadow-soft">
+                                <h3 className="font-semibold text-blue-400 flex items-center mb-4"><Zap size={18} className="mr-2" />Streaks</h3>
+                                <div className="space-y-3 text-sm">
+                                    <div>
+                                        <p className="text-text-secondary">Best Winning Streak</p>
+                                        <p className="text-lg font-bold text-text-primary">{streakData.bestWinningStreak} trades</p>
+                                        <p className="text-text-secondary">P&L during streak: <span className="font-semibold text-green-400">₹{Math.round(streakData.winningStreakPnl).toLocaleString('en-IN')}</span></p>
+                                    </div>
+                                    <div>
+                                        <p className="text-text-secondary">Worst Losing Streak</p>
+                                        <p className="text-lg font-bold text-text-primary">{streakData.worstLosingStreak} trades</p>
+                                        <p className="text-text-secondary">P&L during streak: <span className="font-semibold text-red-400">₹{Math.round(streakData.losingStreakPnl).toLocaleString('en-IN')}</span></p>
+                                    </div>
+                                    <div>
+                                        <p className="text-text-secondary">Current Streak</p>
+                                        <p className="text-lg font-bold text-text-primary">
+                                        {streakData.currentWinningStreak > 0 && `${streakData.currentWinningStreak} Wins`}
+                                        {streakData.currentLosingStreak > 0 && `${streakData.currentLosingStreak} Losses`}
+                                        {streakData.currentWinningStreak === 0 && streakData.currentLosingStreak === 0 && 'None'}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {/* Monthly Performance Card */}
+                            <div className="bg-surface p-5 rounded-xl border border-white/10 shadow-soft">
+                                <h3 className="font-semibold text-purple-400 flex items-center mb-4"><BarChart2 size={18} className="mr-2" />Monthly Bests</h3>
+                                <div className="space-y-3 text-sm">
+                                    <div>
+                                        <p className="text-text-secondary">Best P&L Month</p>
+                                        <p className="text-lg font-bold text-text-primary">{kpis.bestPnl || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-text-secondary">Worst P&L Month</p>
+                                        <p className="text-lg font-bold text-text-primary">{kpis.worstPnl || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-text-secondary">Best Accuracy Month</p>
+                                        <p className="text-lg font-bold text-text-primary">{kpis.bestAccuracy || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-text-secondary">Worst Accuracy Month</p>
+                                        <p className="text-lg font-bold text-text-primary">{kpis.worstAccuracy || 'N/A'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Trade Type Card */}
+                            <div className="bg-surface p-5 rounded-xl border border-white/10 shadow-soft">
+                                <h3 className="font-semibold text-yellow-400 flex items-center mb-4"><TrendingUp size={18} className="mr-2" />By Trade Type</h3>
+                                <div className="space-y-3 text-sm">
+                                    <div>
+                                        <p className="text-text-secondary">Long Trades Net P&L</p>
+                                        <p className={`text-lg font-bold ${longShortData.longNet >= 0 ? 'text-green-400' : 'text-red-400'}`}>₹{Math.round(longShortData.longNet).toLocaleString('en-IN')}</p>
+                                        <p className="text-text-secondary">Accuracy: <span className="font-semibold text-text-primary">{longShortData.longAccuracy.toFixed(2)}%</span></p>
+                                    </div>
+                                    <div>
+                                        <p className="text-text-secondary">Short Trades Net P&L</p>
+                                        <p className={`text-lg font-bold ${longShortData.shortNet >= 0 ? 'text-green-400' : 'text-red-400'}`}>₹{Math.round(longShortData.shortNet).toLocaleString('en-IN')}</p>
+                                        <p className="text-text-secondary">Accuracy: <span className="font-semibold text-text-primary">{longShortData.shortAccuracy.toFixed(2)}%</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
 
                     <motion.div 
                         className="bg-surface/50 backdrop-blur-sm p-6 rounded-xl border border-white/10 shadow-soft mb-6 performance-page-box"

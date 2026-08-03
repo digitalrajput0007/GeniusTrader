@@ -18,7 +18,6 @@ import ProfilePage from './pages/ProfilePage';
 import ChangePasswordPage from './pages/ChangePasswordPage';
 import RankingPage from './pages/RankingPage';
 import PerformancePage from './pages/PerformancePage';
-import DashboardPage from './pages/DashboardPage';
 import Homepage from './pages/Homepage';
 import About from './pages/About';
 import Pricing from './pages/Pricing';

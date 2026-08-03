@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Activity, BarChart3, Bell, ChevronLeft, ChevronRight, FileText, Home, LogOut, Menu, Moon, Plus, Search, Settings, ShieldCheck, Sun, Target, User, Users, X } from 'lucide-react';
+import { Activity, BarChart3, Bell, ChevronLeft, ChevronRight, FileText, LogOut, Menu, Moon, Plus, Search, Settings, ShieldCheck, Sun, Target, User, Users, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import BrandLogo from './BrandLogo';

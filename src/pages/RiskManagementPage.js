@@ -3,14 +3,14 @@ import '../styles/RiskManagementPage.css';
 
 // --- Reusable UI Components ---
 const InputGroup = ({ label, children }) => (
-    <div className="bg-primary-light border border-gray-700 rounded-lg flex items-center shadow-sm">
+    <div className="bg-surface border border-gray-700 rounded-lg flex items-center shadow-sm">
         <span className="py-3 px-4 text-sm font-semibold text-text-secondary border-r border-gray-700 whitespace-nowrap">{label}</span>
         {children}
     </div>
 );
 
 const OutputBox = ({ label, value, unit, large = false }) => (
-    <div className="bg-primary-light border border-gray-700 rounded-lg p-4 text-center shadow-sm h-full flex flex-col justify-center">
+    <div className="bg-surface border border-gray-700 rounded-lg p-4 text-center shadow-sm h-full flex flex-col justify-center">
         <p className="text-sm font-medium text-text-secondary">{label}</p>
         <p className={`font-bold text-text-primary ${large ? 'text-5xl mt-2' : 'text-3xl mt-1'}`}>
             {unit}{value}
@@ -26,7 +26,7 @@ const PieChart = ({ percentage }) => {
                 className="w-48 h-48 rounded-full flex items-center justify-center transition-all duration-500"
                 style={{ background: `conic-gradient(#22c55e ${angle}deg, #374151 ${angle}deg)` }}
             >
-                <div className="w-32 h-32 bg-primary-light rounded-full flex items-center justify-center">
+                <div className="w-32 h-32 bg-surface rounded-full flex items-center justify-center">
                     <span className="text-3xl font-bold text-text-primary">{percentage.toFixed(0)}%</span>
                 </div>
             </div>
@@ -94,20 +94,20 @@ const RiskManagementPage = () => {
             {/* --- Main Inputs (Updated) --- */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <InputGroup label="Enter Your Capital ₹">
-                    <input type="number" value={capital} onChange={e => setCapital(e.target.value)} className="w-full p-3 bg-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
+                    <input type="number" value={capital} onChange={e => setCapital(e.target.value)} className="w-full p-3 bg-surface-secondary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
                 </InputGroup>
                 <InputGroup label="Select Your Risk Profile">
-                    <select value={riskProfile} onChange={e => setRiskProfile(e.target.value)} className="w-full p-3 bg-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold">
+                    <select value={riskProfile} onChange={e => setRiskProfile(e.target.value)} className="w-full p-3 bg-surface-secondary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold">
                         <option value="low">Low Risk</option>
                         <option value="medium">Medium Risk</option>
                         <option value="high">High Risk</option>
                     </select>
                 </InputGroup>
                 <InputGroup label="Enter Max Trades Per Day">
-                    <input type="number" value={maxTrades} onChange={e => setMaxTrades(e.target.value)} className="w-full p-3 bg-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
+                    <input type="number" value={maxTrades} onChange={e => setMaxTrades(e.target.value)} className="w-full p-3 bg-surface-secondary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
                 </InputGroup>
                 <InputGroup label="Enter Lot Size">
-                    <input type="number" value={lotSize} onChange={e => setLotSize(e.target.value)} className="w-full p-3 bg-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
+                    <input type="number" value={lotSize} onChange={e => setLotSize(e.target.value)} className="w-full p-3 bg-surface-secondary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
                 </InputGroup>
             </div>
 
@@ -118,7 +118,7 @@ const RiskManagementPage = () => {
                         type="number" 
                         value={(dailyRiskPercent * 100).toFixed(2)} 
                         onChange={e => setDailyRiskPercent(parseFloat(e.target.value) / 100 || 0)} 
-                        className="w-full p-3 bg-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" 
+                        className="w-full p-3 bg-surface-secondary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" 
                     />
                 </InputGroup>
                 <OutputBox label="Your Daily Risk Limit" unit="₹" value={calculations.dailyRiskLimit.toLocaleString('en-IN', { maximumFractionDigits: 0 })} />
@@ -133,14 +133,14 @@ const RiskManagementPage = () => {
                        <OutputBox label="Target Points" value={calculations.targetPoints.toFixed(2)} />
                     </div>
                     
-                    <div className="bg-primary-light p-6 rounded-lg shadow-lg border border-gray-700 risk-management-page-box">
+                    <div className="bg-surface p-6 rounded-lg shadow-lg border border-gray-700 risk-management-page-box">
                         <h3 className="text-xl font-semibold text-text-primary mb-4 text-center">Risk / Reward Ratio</h3>
                         <div className="flex items-center justify-center gap-4">
                             <InputGroup label="Risk">
-                                <input type="number" value={riskRatio} onChange={e => setRiskRatio(e.target.value)} className="w-full p-3 bg-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
+                                <input type="number" value={riskRatio} onChange={e => setRiskRatio(e.target.value)} className="w-full p-3 bg-surface-secondary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
                             </InputGroup>
                             <InputGroup label="Reward">
-                                <input type="number" value={rewardRatio} onChange={e => setRewardRatio(e.target.value)} className="w-full p-3 bg-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
+                                <input type="number" value={rewardRatio} onChange={e => setRewardRatio(e.target.value)} className="w-full p-3 bg-surface-secondary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-text-primary font-semibold" />
                             </InputGroup>
                         </div>
                     </div>

@@ -49,7 +49,7 @@ const TableControls = ({ totalItems, itemsPerPage, setItemsPerPage, currentPage,
                         setItemsPerPage(Number(e.target.value));
                         setCurrentPage(1);
                     }} 
-                    className="p-1 bg-primary border border-gray-600 rounded-md text-white"
+                    className="p-1 bg-surface-secondary border border-gray-600 rounded-md text-white"
                 >
                     <option value={10}>10</option>
                     <option value={25}>25</option>
@@ -164,7 +164,7 @@ const AdminPage = () => {
         <div className="p-4 md:p-6">
             <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
                 <div className="flex items-center w-full md:w-1/2">
-                    <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Search users, email or role..." className="w-full p-2 rounded-lg bg-primary border border-white/10 text-white" />
+                    <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Search users, email or role..." className="w-full p-2 rounded-lg bg-surface-secondary border border-white/10 text-white" />
                 </div>
                 <div className="flex items-center">
                     <button 
@@ -178,7 +178,7 @@ const AdminPage = () => {
                 </div>
             </div>
 
-            <div className="bg-primary-light p-6 rounded-lg shadow-lg border border-gray-700">
+            <div className="bg-surface p-6 rounded-lg shadow-lg border border-gray-700">
                 <div className="overflow-x-auto rounded-lg">
                     {loading ? (
                         <p className="text-center text-text-secondary">Loading users...</p>
@@ -186,13 +186,13 @@ const AdminPage = () => {
                         <>
                             <table className="min-w-full text-sm">
                                 <thead>
-                                    <tr className="bg-primary-light/60">
-                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Name</th>
-                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Email</th>
-                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Mobile</th>
-                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Gender</th>
-                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Role</th>
-                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Created At</th>
+                                    <tr className="bg-surface/10 border-b border-white/10">
+                                        <th className="text-left p-3 font-semibold">Name</th>
+                                        <th className="text-left p-3 font-semibold">Email</th>
+                                        <th className="text-left p-3 font-semibold">Mobile</th>
+                                        <th className="text-left p-3 font-semibold">Gender</th>
+                                        <th className="text-left p-3 font-semibold">Role</th>
+                                        <th className="text-left p-3 font-semibold">Created At</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-text-primary">

@@ -72,7 +72,7 @@ const ProfilePage = () => {
     <div>
       <h1 className="text-3xl font-bold text-text-primary mb-6">Edit Your Profile</h1>
       
-      <div className="bg-primary-light p-8 rounded-lg shadow-lg max-w-2xl mx-auto">
+      <div className="bg-surface p-8 rounded-lg shadow-lg max-w-2xl mx-auto">
         
         <div className="flex flex-col items-center mb-8">
           <img 
@@ -89,17 +89,17 @@ const ProfilePage = () => {
           {/* --- Editable Fields --- */}
           <div>
             <label className="block text-text-secondary text-sm font-bold mb-2" htmlFor="photoURL">Profile Picture URL</label>
-            <input id="photoURL" name="photoURL" type="url" placeholder="https://example.com/image.png" value={formData.photoURL} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 bg-primary text-text-primary leading-tight focus:outline-none focus:shadow-outline" />
+            <input id="photoURL" name="photoURL" type="url" placeholder="https://example.com/image.png" value={formData.photoURL} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 bg-surface-secondary text-text-primary leading-tight focus:outline-none focus:shadow-outline" />
           </div>
 
           <div>
             <label className="block text-text-secondary text-sm font-bold mb-2" htmlFor="firstName">First Name</label>
-            <input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 bg-primary text-text-primary leading-tight focus:outline-none focus:shadow-outline" required />
+            <input id="firstName" name="firstName" type="text" value={formData.firstName} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 bg-surface-secondary text-text-primary leading-tight focus:outline-none focus:shadow-outline" required />
           </div>
 
           <div>
             <label className="block text-text-secondary text-sm font-bold mb-2" htmlFor="lastName">Last Name</label>
-            <input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 bg-primary text-text-primary leading-tight focus:outline-none focus:shadow-outline" required />
+            <input id="lastName" name="lastName" type="text" value={formData.lastName} onChange={handleChange} className="shadow appearance-none border rounded w-full py-2 px-3 bg-surface-secondary text-text-primary leading-tight focus:outline-none focus:shadow-outline" required />
           </div>
           
           {/* --- 2. NON-EDITABLE FIELDS --- */}

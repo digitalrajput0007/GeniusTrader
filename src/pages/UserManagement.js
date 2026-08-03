@@ -49,7 +49,7 @@ const TableControls = ({ totalItems, itemsPerPage, setItemsPerPage, currentPage,
                         setItemsPerPage(Number(e.target.value));
                         setCurrentPage(1);
                     }} 
-                    className="p-1 bg-primary border border-gray-600 rounded-md text-white"
+                    className="p-1 bg-surface-secondary border border-gray-600 rounded-md text-white"
                 >
                     <option value={10}>10</option>
                     <option value={25}>25</option>
@@ -100,7 +100,7 @@ const EditUserModal = ({ user, onClose, onSave }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-            <div className="bg-primary-light rounded-xl shadow-lg border border-gray-700 p-6 w-full max-w-md">
+            <div className="bg-surface rounded-xl shadow-lg border border-gray-700 p-6 w-full max-w-md">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-bold text-white">Edit User</h2>
                     <button onClick={onClose} className="p-1 rounded-full text-gray-400 hover:bg-gray-700 hover:text-white">
@@ -110,19 +110,19 @@ const EditUserModal = ({ user, onClose, onSave }) => {
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-400 mb-2">First Name</label>
-                        <input type="text" name="firstName" value={formData.firstName || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-primary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
+                        <input type="text" name="firstName" value={formData.firstName || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-surface-secondary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-400 mb-2">Last Name</label>
-                        <input type="text" name="lastName" value={formData.lastName || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-primary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
+                        <input type="text" name="lastName" value={formData.lastName || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-surface-secondary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-400 mb-2">Mobile</label>
-                        <input type="text" name="mobile" value={formData.mobile || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-primary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
+                        <input type="text" name="mobile" value={formData.mobile || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-surface-secondary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-400 mb-2">Gender</label>
-                        <select name="gender" value={formData.gender || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-primary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary">
+                        <select name="gender" value={formData.gender || ''} onChange={handleChange} className="w-full p-2 rounded-lg bg-surface-secondary border border-gray-600 text-white focus:outline-none focus:ring-2 focus:ring-secondary">
                             <option value="">Select Gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -302,7 +302,7 @@ const UserManagement = () => {
     const justifyContentClass = `justify-${align}`; 
 
     return (
-        <th className={`sticky top-0 p-3 font-semibold bg-primary-light/60 cursor-pointer ${alignClass}`} onClick={() => requestSort(name)}>
+        <th className={`sticky top-0 p-3 font-semibold bg-surface/60 cursor-pointer ${alignClass}`} onClick={() => requestSort(name)}>
             <div className={`flex items-center ${justifyContentClass}`}>
                 {children}
                 {isSorted && (sortConfig.direction === 'ascending' ? <ChevronUp size={14} className="ml-1"/> : <ChevronDown size={14} className="ml-1" />)}
@@ -344,9 +344,9 @@ const UserManagement = () => {
 
   return (
     <div className="p-4 md:p-6">
-        <div className="bg-primary-light p-6 rounded-xl shadow-lg border border-gray-800">
+        <div className="bg-surface p-6 rounded-xl shadow-lg border border-gray-800">
             <div className="flex items-center justify-between mb-4">
-                <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Search by name or email..." className="w-full md:w-1/3 p-2 rounded-lg bg-primary border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
+                <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Search by name or email..." className="w-full md:w-1/3 p-2 rounded-lg bg-surface-secondary border border-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-secondary" />
                  <button onClick={exportToExcel} className="ml-4 px-4 py-2 rounded-lg bg-secondary hover:bg-secondary-dark text-white font-semibold transition-colors flex items-center">
                     <FileDown size={18} className="mr-2" />
                     Export to Excel
@@ -359,15 +359,15 @@ const UserManagement = () => {
                     <>
                         <table className="min-w-full text-sm">
                             <thead>
-                                <tr className="bg-primary-light/60">
+                                <tr className="bg-surface/60">
                                     <SortableHeader name="name" align="left">Name</SortableHeader>
-                                    <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Email</th>
-                                    <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Mobile</th>
-                                    <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Gender</th>
-                                    <th className="sticky top-0 text-center p-3 font-semibold bg-primary-light/60">Role</th>
+                                    <th className="sticky top-0 text-left p-3 font-semibold bg-surface/60">Email</th>
+                                    <th className="sticky top-0 text-left p-3 font-semibold bg-surface/60">Mobile</th>
+                                    <th className="sticky top-0 text-left p-3 font-semibold bg-surface/60">Gender</th>
+                                    <th className="sticky top-0 text-center p-3 font-semibold bg-surface/60">Role</th>
                                     <SortableHeader name="status" align="center">Status</SortableHeader>
                                     <SortableHeader name="createdAt" align="center">Created Date</SortableHeader>
-                                    <th className="sticky top-0 text-right p-3 font-semibold bg-primary-light/60">Actions</th>
+                                    <th className="sticky top-0 text-right p-3 font-semibold bg-surface/60">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="text-text-primary">

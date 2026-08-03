@@ -60,7 +60,7 @@ const CurrencyConverterPage = () => {
 
     return (
         <div className="flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-2xl bg-primary-light p-8 rounded-2xl shadow-2xl border border-gray-700">
+            <div className="w-full max-w-2xl bg-surface p-8 rounded-2xl shadow-2xl border border-gray-700">
                 <h1 className="text-3xl font-bold text-text-primary mb-6 text-center md:hidden">Currency Converter</h1>
                 <p className="text-text-secondary text-center mb-8">Get real-time exchange rates for international trading.</p>
 
@@ -73,13 +73,13 @@ const CurrencyConverterPage = () => {
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
-                                className="w-2/3 p-3 bg-primary rounded-l-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-lg"
+                                className="w-2/3 p-3 bg-surface-secondary rounded-l-lg focus:outline-none focus:ring-2 focus:ring-secondary transition text-lg"
                             />
                             <select 
                                 id="from"
                                 value={fromCurrency} 
                                 onChange={(e) => setFromCurrency(e.target.value)}
-                                className="w-1/3 p-3 bg-primary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition appearance-none text-center font-semibold"
+                                className="w-1/3 p-3 bg-surface-secondary rounded-r-lg focus:outline-none focus:ring-2 focus:ring-secondary transition appearance-none text-center font-semibold"
                             >
                                 {currencies.map(currency => <option key={currency} value={currency}>{currency}</option>)}
                             </select>
@@ -100,7 +100,7 @@ const CurrencyConverterPage = () => {
                             id="to"
                             value={toCurrency} 
                             onChange={(e) => setToCurrency(e.target.value)}
-                            className="w-full p-3 bg-primary rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition appearance-none text-center font-semibold text-lg"
+                            className="w-full p-3 bg-surface-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition appearance-none text-center font-semibold text-lg"
                         >
                             {currencies.map(currency => <option key={currency} value={currency}>{currency}</option>)}
                         </select>

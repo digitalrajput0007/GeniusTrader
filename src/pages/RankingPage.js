@@ -59,7 +59,7 @@ const TableControls = ({ totalItems, itemsPerPage, setItemsPerPage, currentPage,
                         setItemsPerPage(Number(e.target.value));
                         setCurrentPage(1);
                     }} 
-                    className="p-1 bg-primary border border-gray-600 rounded-md text-white"
+                    className="p-1 bg-surface-secondary border border-gray-600 rounded-md text-white"
                 >
                     <option value={10}>10</option>
                     <option value={25}>25</option>
@@ -185,9 +185,9 @@ const RankingPage = () => {
 
     return (
         <div className="p-4 md:p-6">
-            <div className="bg-primary-light p-6 rounded-lg shadow-lg border border-gray-700">
+            <div className="bg-surface p-6 rounded-lg shadow-lg border border-gray-700">
                 <div className="flex items-center justify-between mb-4">
-                    <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Search name, rank or P&L..." className="w-full md:w-1/3 p-2 rounded-lg bg-primary border border-white/10 text-white" />
+                    <input value={searchQuery} onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }} placeholder="Search name, rank or P&L..." className="w-full md:w-1/3 p-2 rounded-lg bg-surface-secondary border border-white/10 text-white" />
                     <button onClick={exportToExcel} className="ml-4 px-4 py-2 rounded-lg bg-secondary hover:bg-secondary-dark text-white font-semibold transition-colors flex items-center">
                         <FileDown size={18} className="mr-2" />
                         Export to Excel
@@ -200,13 +200,13 @@ const RankingPage = () => {
                         <>
                             <table className="min-w-full text-sm">
                                 <thead>
-                                    <tr className="bg-primary-light/60">
-                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Rank</th>
-                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Name</th>
-                                        <th className="sticky top-0 text-left p-3 font-semibold bg-primary-light/60">Total P&L</th>
-                                        <th className="sticky top-0 text-center p-3 font-semibold bg-primary-light/60">Open Trades</th>
-                                        <th className="sticky top-0 text-center p-3 font-semibold bg-primary-light/60">Closed Trades</th>
-                                        <th className="sticky top-0 text-center p-3 font-semibold bg-primary-light/60">Avg. Trades/Day</th>
+                                    <tr className="bg-surface/10 border-b border-white/10">
+                                        <th className="text-left p-3 font-semibold">Rank</th>
+                                        <th className="text-left p-3 font-semibold">Name</th>
+                                        <th className="text-left p-3 font-semibold">Total P&L</th>
+                                        <th className="text-center p-3 font-semibold">Open Trades</th>
+                                        <th className="text-center p-3 font-semibold">Closed Trades</th>
+                                        <th className="text-center p-3 font-semibold">Avg. Trades/Day</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-text-primary">

@@ -3,7 +3,7 @@ import { db, auth } from '../firebase';
 import { collection, getDocs, doc, updateDoc, deleteDoc, Timestamp, addDoc } from 'firebase/firestore';
 import ExcelUpload from '../components/ExcelUpload';
 import * as XLSX from 'xlsx';
-import { Upload, Edit, Trash2, Check, ArrowDown, ArrowUp, CheckCircle, XCircle, MinusCircle, TrendingUp, TrendingDown, BarChart2, Zap, Target, HelpCircle } from 'lucide-react';
+import { Upload, Edit, Trash2, Check, ArrowDown, ArrowUp, CheckCircle, XCircle, MinusCircle, TrendingUp, BarChart2, Zap } from 'lucide-react';
 import toast from 'react-hot-toast';
 import AddNewTradeForm from '../components/AddNewTradeForm';
 import FourMonthCalendar from '../components/MonthlyCalendar';
@@ -638,7 +638,7 @@ const PerformancePage = () => {
                                 <option value="All">All Months</option>
                                 {monthlySummary.map(s => <option key={s.month} value={s.month}>{new Date(s.month).toLocaleString('default', { month: 'short', year: 'numeric' })}</option>)}
                             </select>
-                            <button onClick={() => setIsModalOpen(true)} className="bg-primary text-white px-3 py-2 rounded-md flex items-center gap-2">
+                            <button onClick={() => setIsModalOpen(true)} className="bg-surface-secondary text-white px-3 py-2 rounded-md flex items-center gap-2">
                                 <Upload size={16} /> Import from Excel
                             </button>
                         </div>
@@ -671,8 +671,8 @@ const PerformancePage = () => {
                         <h2 className="text-xl font-semibold text-text-primary mb-4">Monthly Analysis</h2>
                         <div className="overflow-x-auto">
                             <table className="min-w-full text-sm">
-                                <thead className="border-b border-white/10 text-text-secondary">
-                                    <tr>
+                                <thead>
+                                    <tr className="bg-surface/10 border-b border-white/10">
                                         <th className="p-3 text-left font-semibold">Month</th>
                                         <th className="p-3 text-center font-semibold">Net P&L (₹)</th>
                                         <th className="p-3 text-center font-semibold">Accuracy (%)</th>
@@ -899,14 +899,14 @@ const PerformancePage = () => {
                                 <div className="rounded-lg overflow-hidden">
                                 <table className="min-w-full text-sm">
                                 <thead>
-                                    <tr className="bg-primary-light/60">
-                                        <th className="sticky top-0 p-3 text-center bg-primary-light/60"><input type="checkbox" onChange={toggleSelectAll} checked={trades.length > 0 && selected.size === trades.length} className="bg-surface border-white/20 rounded"/></th>
+                                    <tr className="bg-surface/10 border-b border-white/10">
+                                        <th className="p-3 text-center"><input type="checkbox" onChange={toggleSelectAll} checked={trades.length > 0 && selected.size === trades.length} className="bg-surface border-white/20 rounded"/></th>
                                         {headers.map(header => {
                                              let key = header.toLowerCase().replace(/\s+/g, '');
                                              if(key === 'totalp&l') key = 'totalPnl';
                                              if(key === 'stoploss') key = 'stopLoss';
                                             return (
-                                                <th key={key} className="sticky top-0 p-3 text-center cursor-pointer bg-primary-light/60" onClick={() => handleSort(key)}>
+                                                <th key={key} className="p-3 text-center cursor-pointer" onClick={() => handleSort(key)}>
                                                     <div className="flex items-center justify-center">
                                                         {header}
                                                         {renderSortArrow(key)}
@@ -914,7 +914,7 @@ const PerformancePage = () => {
                                                 </th>
                                             )
                                         })}
-                                        <th className="sticky top-0 p-3 text-center font-semibold bg-primary-light/60">Actions</th>
+                                        <th className="p-3 text-center font-semibold">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="text-text-primary">
